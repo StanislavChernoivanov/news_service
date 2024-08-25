@@ -1,0 +1,15 @@
+
+spring:
+  main:
+    allow-circular-references: true
+  jpa:
+    generate-ddl: true
+  datasource:
+    username: mysql
+    password: mysql
+    url: jdbc:mysql://localhost:3307/news_service
+    hikari:
+      schema: news_service_schema
+      connection-ini-sql: CREATE SCHEMA IF NOT EXISTS news_service_schema
+
+
