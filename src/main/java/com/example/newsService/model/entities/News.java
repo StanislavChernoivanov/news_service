@@ -2,13 +2,11 @@ package com.example.newsService.model.entities;
 
 import jakarta.persistence.*;
 import jdk.jfr.Timestamp;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +15,7 @@ import java.util.stream.Collectors;
 @Table(name = "news")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class News {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +40,9 @@ public class News {
 
     @OneToMany(mappedBy = "news", cascade = CascadeType.ALL)
     @ToString.Exclude
-    private List<Comment> commentList;
+    @Builder.Default
+    private List<Comment> commentList = new ArrayList<>();
+
 
 
     public void addComment(Comment comment) {

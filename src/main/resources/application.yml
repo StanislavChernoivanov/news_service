@@ -4,10 +4,14 @@ spring:
     allow-circular-references: true
   jpa:
     generate-ddl: true
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
   datasource:
     username: mysql
     password: mysql
-    url: jdbc:mysql://localhost:3307/news_service
+    url: jdbc:mysql://localhost:3310/news_service_db
     hikari:
       schema: news_service_schema
       connection-ini-sql: CREATE SCHEMA IF NOT EXISTS news_service_schema

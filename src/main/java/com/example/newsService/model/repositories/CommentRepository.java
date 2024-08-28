@@ -12,6 +12,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
 
     List<Comment> findAllByNewsId(Long newsId);
-
-
+    @Query("select count(c) from Comment c where id = :commentId and c.user.id = :userId")
+    int countCommentsByIdAndUserId(Long commentId, Long userId);
+    @Query("select count(c) from Comment c where c.news.id = :newsId")
+    Integer countByNewsId(Long newsId);
 }

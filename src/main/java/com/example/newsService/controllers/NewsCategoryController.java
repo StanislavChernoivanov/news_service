@@ -4,6 +4,7 @@ import com.example.newsService.mapper.NewsCategoryMapper;
 import com.example.newsService.model.entities.Comment;
 import com.example.newsService.model.entities.NewsCategory;
 import com.example.newsService.services.NewsCategoryService;
+import com.example.newsService.web.model.fromRequest.RequestPageableModel;
 import com.example.newsService.web.model.fromRequest.UpsertCommentRequest;
 import com.example.newsService.web.model.fromRequest.UpsertNewsCategoryRequest;
 import com.example.newsService.web.model.toResponse.CommentResponse;
@@ -24,10 +25,11 @@ public class NewsCategoryController {
     private final NewsCategoryMapper mapper;
 
     @GetMapping
-    public ResponseEntity<NewsCategoryListResponse> findAll() {
+    public ResponseEntity<NewsCategoryListResponse> findAll(
+            @RequestParam RequestPageableModel model) {
         return ResponseEntity.ok(
                 mapper.newsCategoryListToNewsCategoryResponseList(
-                        service.findAll()
+                        service.findAll(model)
                 )
         );
     }

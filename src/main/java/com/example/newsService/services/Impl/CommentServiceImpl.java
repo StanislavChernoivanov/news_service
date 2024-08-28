@@ -1,5 +1,6 @@
 package com.example.newsService.services.Impl;
 
+import com.example.newsService.exceptions.DeniedAccessToOperationException;
 import com.example.newsService.exceptions.EntityNotFoundException;
 import com.example.newsService.model.entities.Comment;
 import com.example.newsService.model.entities.News;
@@ -38,7 +39,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment save(Comment comment) {
         User user = userService.findById(comment.getUser().getId());
-        News news = newsService.findById(comment.getNews().getId());
+        News news = newsService.findById(comment.getNews().getId()).getB();
         comment.setNews(news);
         comment.setUser(user);
         return repository.save(comment);
@@ -47,13 +48,25 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment update(Long commentId, Comment comment) {
         User user = userService.findById(comment.getUser().getId());
-        News news = newsService.findById(comment.getNews().getId());
+        News news = newsService.findById(comment.getNews().getId()).getB();
         Comment updatedComment = new Comment();
         BeanUtils.copyNotNullProperties(comment, updatedComment);
         updatedComment.setNews(news);
         updatedComment.setUser(user);
         return repository.save(updatedComment);
     }
+    @Override
+    public void checkAccessByUser(Long userId, Long commentId) {
+        int countCommentsByUser = repository.countCommentsByIdAndUserId(commentId, userId);
+        if (countCommentsByUser < 1) {
+            throw new DeniedAccessToOperationException(
+                    String
+                    .format("У пользователя с id %s отсутствует доступ для редактирования" +
+                    "или удаления данного коментария", userId));
+        }
+    }
+
+
 
 
     @Override

@@ -1,5 +1,6 @@
 package com.example.newsService.controllers.handlers;
 
+import com.example.newsService.exceptions.DeniedAccessToOperationException;
 import com.example.newsService.exceptions.EntityNotFoundException;
 import com.example.newsService.web.model.toResponse.ErrorResponse;
 import lombok.Data;
@@ -39,5 +40,13 @@ public class ExceptionHandlerController {
         String errorMessage = String.join("; ", errorMessages);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).
                 body(new ErrorResponse(errorMessage));
+    }
+
+    @ExceptionHandler(DeniedAccessToOperationException.class)
+    public ResponseEntity<ErrorResponse> notAccess(DeniedAccessToOperationException ex) {
+        log.error("Отсутствует доступ для редактирования или удаления новости", ex);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                body(new ErrorResponse(ex.getLocalizedMessage()));
     }
 }

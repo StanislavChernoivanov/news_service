@@ -15,4 +15,6 @@ public interface CommentService {
     Comment update(Long commentId, Comment comment);
 
     void delete(Long commentId);
+
+    void checkAccessByUser(Long userId, Long commentId);
 }

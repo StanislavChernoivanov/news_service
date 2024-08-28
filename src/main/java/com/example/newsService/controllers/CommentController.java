@@ -1,5 +1,6 @@
 package com.example.newsService.controllers;
 
+import com.example.newsService.aop.Accessible;
 import com.example.newsService.mapper.CommentMapper;
 import com.example.newsService.model.entities.Comment;
 import com.example.newsService.services.CommentService;
@@ -50,16 +51,19 @@ public class CommentController {
     }
 
     @PutMapping("/{id}")
+    @Accessible
     public ResponseEntity<CommentResponse> update(
             @PathVariable("id") Long commentId,
-            @RequestBody @Valid UpsertCommentRequest request) {
+            @RequestBody @Valid UpsertCommentRequest upsertCommentRequest) {
         Comment comment = commentService.update(commentId,
-                commentMapper.requestToComment(commentId, request));
+                commentMapper.requestToComment(commentId, upsertCommentRequest));
         return ResponseEntity.ok(commentMapper.commentToResponse(comment));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("{id}") Long commentId) {
+    @Accessible
+    public ResponseEntity<Void> delete(@PathVariable("{id}") Long commentId,
+                                       @RequestParam Long userId) {
         commentService.delete(commentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

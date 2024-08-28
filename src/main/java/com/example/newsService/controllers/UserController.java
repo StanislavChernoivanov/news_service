@@ -6,6 +6,7 @@ import com.example.newsService.model.entities.News;
 import com.example.newsService.model.entities.User;
 import com.example.newsService.services.NewsService;
 import com.example.newsService.services.UserService;
+import com.example.newsService.web.model.fromRequest.RequestPageableModel;
 import com.example.newsService.web.model.fromRequest.UpsertNewsRequest;
 import com.example.newsService.web.model.fromRequest.UpsertUserRequest;
 import com.example.newsService.web.model.toResponse.NewsListResponse;
@@ -27,10 +28,10 @@ public class UserController {
     private final UserMapper mapper;
 
     @GetMapping
-    public ResponseEntity<UserListResponse> findAll() {
+    public ResponseEntity<UserListResponse> findAll(@RequestParam RequestPageableModel model) {
         return ResponseEntity.ok(
                 mapper.userListToUserResponseList(
-                        service.findAll()
+                        service.findAll(model)
                 )
         );
     }
