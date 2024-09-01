@@ -38,7 +38,7 @@ public class NewsController {
         );
     }
     @GetMapping
-    public ResponseEntity<NewsListResponse> findAll(RequestPageableModel requestPageableModel) {
+    public ResponseEntity<NewsListResponse> findAll(@RequestBody @Valid RequestPageableModel requestPageableModel) {
         return ResponseEntity.ok(
                 mapper.newsListToNewsResponseList(
                         newsService.findAll(requestPageableModel)

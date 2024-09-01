@@ -8,5 +8,5 @@ import java.util.List;
 @Data
 public class CommentListResponse {
 
-    private List<CommentResponse> comments = new ArrayList<>();
+    private List<CommentResponse> commentList = new ArrayList<>();
 }

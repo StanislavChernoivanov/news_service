@@ -11,6 +11,6 @@ public class UserResponse {
     private Long id;
     private String name;
     private String surname;
-    private List<CommentResponse> comments = new ArrayList<>();
-    private List<NewsResponse> newsList = new ArrayList<>();
+    private List<CommentResponse> commentList;
+    private List<NewsResponse> newsList;
 }

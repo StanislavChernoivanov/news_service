@@ -22,7 +22,7 @@ public interface CommentMapper {
 
     default CommentListResponse commentListToCommentResponseList(List<Comment> comments){
         CommentListResponse commentListResponse = new CommentListResponse();
-        commentListResponse.setComments(commentListToResponseList(comments));
+        commentListResponse.setCommentList(commentListToResponseList(comments));
         return commentListResponse;
     }
 }

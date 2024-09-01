@@ -15,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,4 +50,17 @@ public class ExceptionHandlerController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).
                 body(new ErrorResponse(ex.getLocalizedMessage()));
     }
+
+//    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+//    public ResponseEntity<ErrorResponse> notValid(SQLIntegrityConstraintViolationException ex) {
+//        ex.
+//        BindingResult bindingResult = ex.getBindingResult();
+//        List<String> errorMessages = bindingResult.getAllErrors().
+//                stream().
+//                map(DefaultMessageSourceResolvable::getDefaultMessage).
+//                toList();
+//        String errorMessage = String.join("; ", errorMessages);
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).
+//                body(new ErrorResponse(errorMessage));
+//    }
 }

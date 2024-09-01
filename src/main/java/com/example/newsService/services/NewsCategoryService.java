@@ -13,4 +13,5 @@ public interface NewsCategoryService {
 
     NewsCategory save(NewsCategory newsCategory);
 
+    void delete(Long newsCategoryId);
 }

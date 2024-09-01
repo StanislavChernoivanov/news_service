@@ -1,30 +1,34 @@
 package com.example.newsService.model.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-@Entity
-@Table(name = "news_categories")
+@Entity()
+@Table(name = "news_categories", indexes = @Index(name = "NEWS_CATEGORY_INDEX"
+        , unique = true
+        , columnList = "category"))
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class NewsCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String categoryName;
+    @NotNull
+    private String category;
 
     @OneToMany(mappedBy = "newsCategory", cascade = CascadeType.ALL)
-    @Column(name = "news_list")
     @ToString.Exclude
-    private List<News> newsList;
+    @Builder.Default
+    private List<News> newsList = new ArrayList<>();
 
 
     public void addNews(News news) {

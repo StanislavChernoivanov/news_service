@@ -16,7 +16,7 @@ public class BeanUtils {
             Object value = field.get(source);
 
             if (value != null) {
-                field.set(destination, source);
+                field.set(destination, value);
             }
         }
     }

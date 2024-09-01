@@ -28,7 +28,7 @@ public class UserController {
     private final UserMapper mapper;
 
     @GetMapping
-    public ResponseEntity<UserListResponse> findAll(@RequestParam RequestPageableModel model) {
+    public ResponseEntity<UserListResponse> findAll(@RequestBody @Valid RequestPageableModel model) {
         return ResponseEntity.ok(
                 mapper.userListToUserResponseList(
                         service.findAll(model)

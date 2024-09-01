@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
     @Override
+    @Transactional
     public List<User> findAll(RequestPageableModel model) {
         Page<User> userPage = repository.findAll(
                 PageRequest.of(model.getPageNumber(), model.getPageSize())
@@ -27,6 +29,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+
     public User findById(Long userId) {
         return repository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException(
