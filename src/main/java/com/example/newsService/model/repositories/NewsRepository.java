@@ -17,6 +17,6 @@ public interface NewsRepository extends JpaRepository<News, Long>, JpaSpecificat
     int countNewsByIdAndUserId(Long newsId, Long userId);
 
 
-    @EntityGraph(attributePaths = "comments")
+    @EntityGraph(attributePaths = "commentsList")
     Optional<News> findById(Long newsId);
 }

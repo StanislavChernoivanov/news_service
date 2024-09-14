@@ -9,6 +9,8 @@ spring:
       hibernate:
         show_sql: false
         format_sql: false
+        hbm2ddl:
+          auto: update
   datasource:
     username: mysql
     password: mysql

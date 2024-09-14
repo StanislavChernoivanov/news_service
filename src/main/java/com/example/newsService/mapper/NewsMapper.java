@@ -2,8 +2,10 @@ package com.example.newsService.mapper;
 
 import com.example.newsService.model.entities.News;
 import com.example.newsService.web.model.fromRequest.UpsertNewsRequest;
-import com.example.newsService.web.model.toResponse.NewsListResponse;
-import com.example.newsService.web.model.toResponse.NewsResponse;
+import com.example.newsService.web.model.toResponse.newsResponse.NewsListResponse;
+import com.example.newsService.web.model.toResponse.newsResponse.NewsResponse;
+import com.example.newsService.web.model.toResponse.newsResponse.NewsResponseWithCommentsAmount;
+import com.example.newsService.web.model.toResponse.newsResponse.NewsResponseWithCommentsList;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -18,14 +20,13 @@ public interface NewsMapper {
     @Mapping(source = "newsId", target = "id")
     News requestToNews(Long newsId, UpsertNewsRequest upsertNewsRequest);
 
-    NewsResponse newsToResponse(News news);
+    NewsResponseWithCommentsList newsToResponse(News news);
 
-    List<NewsResponse> newsListToResponseList(List<News> news);
+    List<NewsResponseWithCommentsAmount> newsListToResponseList(List<News> news);
 
     default NewsListResponse newsListToNewsResponseList
             (List<News> news) {
-        NewsListResponse newsListResponse = new NewsListResponse();
-        newsListResponse.setNewsList(newsListToResponseList(news));
-        return newsListResponse;
+
+        return new NewsListResponse(newsListToResponseList(news));
     }
 }

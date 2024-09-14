@@ -1,9 +1,9 @@
 package com.example.newsService.model.entities;
 
 import jakarta.persistence.*;
-import jdk.jfr.Timestamp;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -41,17 +41,26 @@ public class News {
     @OneToMany(mappedBy = "news", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
-    private List<Comment> commentList = new ArrayList<>();
+    private List<Comment> commentsList = new ArrayList<>();
+
+    @Transient
+    private Integer commentsAmount;
+
+    @Transient
+    private String category;
+
+    @Transient
+    private Long categoryId;
 
 
 
     public void addComment(Comment comment) {
-        commentList.add(comment);
+        commentsList.add(comment);
     }
 
 
     public void removeComment(Long commentId) {
-        commentList = commentList.stream().filter(c -> !c.getId().equals(commentId)).collect(Collectors.toList());
+        commentsList = commentsList.stream().filter(c -> !c.getId().equals(commentId)).collect(Collectors.toList());
     }
 
 

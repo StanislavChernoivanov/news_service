@@ -1,13 +1,9 @@
 package com.example.newsService.mapper;
 
-import com.example.newsService.model.entities.Comment;
 import com.example.newsService.model.entities.User;
-import com.example.newsService.web.model.fromRequest.UpsertCommentRequest;
 import com.example.newsService.web.model.fromRequest.UpsertUserRequest;
-import com.example.newsService.web.model.toResponse.CommentListResponse;
-import com.example.newsService.web.model.toResponse.CommentResponse;
-import com.example.newsService.web.model.toResponse.UserListResponse;
-import com.example.newsService.web.model.toResponse.UserResponse;
+import com.example.newsService.web.model.toResponse.userResponse.UserListResponse;
+import com.example.newsService.web.model.toResponse.userResponse.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -29,5 +25,6 @@ public interface UserMapper {
         UserListResponse userListResponse = new UserListResponse();
         userListResponse.setUsers(userListToResponseList(users));
         return userListResponse;
+
     }
 }

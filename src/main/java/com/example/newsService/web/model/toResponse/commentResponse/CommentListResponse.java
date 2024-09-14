@@ -1,4 +1,4 @@
-package com.example.newsService.web.model.toResponse;
+package com.example.newsService.web.model.toResponse.commentResponse;
 
 import lombok.Data;
 

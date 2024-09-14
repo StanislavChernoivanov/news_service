@@ -1,4 +1,4 @@
-package com.example.newsService.model.repositories;
+package com.example.newsService.model.repositories.specifications;
 
 import com.example.newsService.model.entities.News;
 import com.example.newsService.web.model.filters.NewsFilter;
@@ -6,9 +6,9 @@ import org.springframework.data.jpa.domain.Specification;
 
 public interface NewsSpecification {
 
-    static Specification<News> withFilter(NewsFilter newsFilter) {
-        return Specification.where(byNewsCategoryId(newsFilter.getNewsCategoryId())).
-                and(byUserId(newsFilter.getUserId()));
+    static Specification<News> withFilter(Long userId, Long newsCategoryId) {
+        return Specification.where(byNewsCategoryId(newsCategoryId)).
+                and(byUserId(userId));
     }
 
 

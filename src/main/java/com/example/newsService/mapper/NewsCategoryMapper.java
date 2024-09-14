@@ -2,8 +2,8 @@ package com.example.newsService.mapper;
 
 import com.example.newsService.model.entities.NewsCategory;
 import com.example.newsService.web.model.fromRequest.UpsertNewsCategoryRequest;
-import com.example.newsService.web.model.toResponse.NewsCategoryListResponse;
-import com.example.newsService.web.model.toResponse.NewsCategoryResponse;
+import com.example.newsService.web.model.toResponse.newsCategoryResponse.NewsCategoryListResponse;
+import com.example.newsService.web.model.toResponse.newsCategoryResponse.NewsCategoryResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

@@ -25,19 +25,19 @@ public class NewsCategory {
     @NotNull
     private String category;
 
-    @OneToMany(mappedBy = "newsCategory", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "newsCategory", cascade = CascadeType.MERGE)
     @ToString.Exclude
     @Builder.Default
     private List<News> newsList = new ArrayList<>();
 
 
-    public void addNews(News news) {
-        newsList.add(news);
-    }
-
-    public void removeNews(Long newsId) {
-        newsList = newsList.stream().filter(n -> !n.getId().equals(newsId)).collect(Collectors.toList());
-    }
+//    public void addNews(News news) {
+//        newsList.add(news);
+//    }
+//
+//    public void removeNews(Long newsId) {
+//        newsList = newsList.stream().filter(n -> !n.getId().equals(newsId)).collect(Collectors.toList());
+//    }
 
 
 }

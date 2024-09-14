@@ -2,8 +2,8 @@ package com.example.newsService.mapper;
 
 import com.example.newsService.model.entities.Comment;
 import com.example.newsService.web.model.fromRequest.UpsertCommentRequest;
-import com.example.newsService.web.model.toResponse.CommentListResponse;
-import com.example.newsService.web.model.toResponse.CommentResponse;
+import com.example.newsService.web.model.toResponse.commentResponse.CommentListResponse;
+import com.example.newsService.web.model.toResponse.commentResponse.CommentResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

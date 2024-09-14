@@ -4,12 +4,12 @@ import com.example.newsService.aop.Accessible;
 import com.example.newsService.mapper.NewsMapper;
 import com.example.newsService.model.entities.News;
 import com.example.newsService.services.CommentService;
-import com.example.newsService.services.GenericModel;
 import com.example.newsService.services.NewsService;
 import com.example.newsService.web.model.filters.NewsFilter;
 import com.example.newsService.web.model.fromRequest.RequestPageableModel;
 import com.example.newsService.web.model.fromRequest.UpsertNewsRequest;
-import com.example.newsService.web.model.toResponse.*;
+import com.example.newsService.web.model.toResponse.newsResponse.NewsListResponse;
+import com.example.newsService.web.model.toResponse.newsResponse.NewsResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,36 +31,41 @@ public class NewsController {
 
 
     @GetMapping("/filter")
-    public ResponseEntity<NewsListResponse> filterBy(@RequestParam NewsFilter newsFilter) {
-        List<News> newsList = newsService.filterBy(newsFilter);
+    public ResponseEntity<NewsListResponse> filterBy(
+            @RequestParam Long userId,
+            @RequestParam Long newsCategoryId,
+            @RequestBody RequestPageableModel model) {
+        List<News> newsList = newsService.filterBy(
+                userId,
+                newsCategoryId,
+                model);
         return ResponseEntity.ok(
                 mapper.newsListToNewsResponseList(newsList)
         );
     }
     @GetMapping
     public ResponseEntity<NewsListResponse> findAll(@RequestBody @Valid RequestPageableModel requestPageableModel) {
-        return ResponseEntity.ok(
-                mapper.newsListToNewsResponseList(
-                        newsService.findAll(requestPageableModel)
-                )
-        );
+
+        List<News> newsList = newsService.findAll(requestPageableModel);
+        return ResponseEntity.ok(mapper.newsListToNewsResponseList(newsList));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<NewsResponse> findById(@PathVariable("id") Long newsId) {
-        GenericModel<Integer, News> model = newsService.findById(newsId);
 
-        NewsResponse newsResponse = mapper.newsToResponse(model.getB());
-        newsResponse.setCommentsAmount(model.getA());
-        return ResponseEntity.ok(newsResponse);
+        return ResponseEntity.ok(
+                mapper.newsToResponse(newsService.findById(newsId))
+        );
     }
 
 
     @PostMapping
-    public ResponseEntity<NewsResponse> create(
+    public ResponseEntity<NewsResponse> create(@RequestParam("userId") Long userId,
             @RequestBody @Valid UpsertNewsRequest upsertNewsRequest) {
         News news= newsService.save(
-                mapper.requestToNews(upsertNewsRequest));
+                mapper.requestToNews(upsertNewsRequest)
+                , userId
+                , upsertNewsRequest.getCategoryId());
         return ResponseEntity.status(HttpStatus.CREATED).
                 body(mapper.newsToResponse(news));
     }
@@ -69,16 +74,16 @@ public class NewsController {
     @PutMapping("/{id}")
     @Accessible
     public ResponseEntity<NewsResponse> update(
-            @PathVariable("id") Long newsId,
+            @PathVariable("id") Long newsId, @RequestParam Long userId,
             @RequestBody @Valid UpsertNewsRequest upsertNewsRequest) {
-        News news = newsService.update(newsId,
+        News news = newsService.update(newsId, userId,
                 mapper.requestToNews(newsId, upsertNewsRequest));
         return ResponseEntity.ok(mapper.newsToResponse(news));
     }
 
     @DeleteMapping("/{id}")
     @Accessible
-    public ResponseEntity<Void> delete(@PathVariable("{id}") Long newsId,
+    public ResponseEntity<Void> delete(@PathVariable("id") Long newsId,
                                        @RequestParam Long userId) {
         newsService.delete(newsId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

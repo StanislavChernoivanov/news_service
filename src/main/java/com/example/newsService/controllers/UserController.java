@@ -1,23 +1,20 @@
 package com.example.newsService.controllers;
 
-import com.example.newsService.mapper.NewsMapper;
 import com.example.newsService.mapper.UserMapper;
-import com.example.newsService.model.entities.News;
 import com.example.newsService.model.entities.User;
-import com.example.newsService.services.NewsService;
 import com.example.newsService.services.UserService;
 import com.example.newsService.web.model.fromRequest.RequestPageableModel;
-import com.example.newsService.web.model.fromRequest.UpsertNewsRequest;
 import com.example.newsService.web.model.fromRequest.UpsertUserRequest;
-import com.example.newsService.web.model.toResponse.NewsListResponse;
-import com.example.newsService.web.model.toResponse.NewsResponse;
-import com.example.newsService.web.model.toResponse.UserListResponse;
-import com.example.newsService.web.model.toResponse.UserResponse;
+import com.example.newsService.web.model.toResponse.userResponse.UserListResponse;
+import com.example.newsService.web.model.toResponse.userResponse.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/user/")
 @RequiredArgsConstructor
@@ -28,7 +25,12 @@ public class UserController {
     private final UserMapper mapper;
 
     @GetMapping
-    public ResponseEntity<UserListResponse> findAll(@RequestBody @Valid RequestPageableModel model) {
+    public ResponseEntity<UserListResponse> findAll
+            (@RequestBody @Valid RequestPageableModel model) {
+
+        List<User> users = service.findAll(model);
+
+        UserListResponse response = mapper.userListToUserResponseList(users);
         return ResponseEntity.ok(
                 mapper.userListToUserResponseList(
                         service.findAll(model)
@@ -64,7 +66,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("{id}") Long userId) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long userId) {
         service.delete(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

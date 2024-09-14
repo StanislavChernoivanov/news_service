@@ -12,7 +12,6 @@ import com.example.newsService.services.UserService;
 import com.example.newsService.utils.BeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @RequiredArgsConstructor
@@ -27,7 +26,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<Comment> findAllByNewsId(Long newsId) {
-        return repository.findAllByNewsId(newsId);
+        News news = newsService.findById(newsId);
+        return news.getCommentsList();
     }
 
     @Override
@@ -38,9 +38,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment save(Comment comment) {
-        User user = userService.findById(comment.getUser().getId());
-        News news = newsService.findById(comment.getNews().getId()).getB();
+    public Comment save(Long userId, Long newsId, Comment comment) {
+        User user = userService.findById(userId);
+        News news = newsService.findById(newsId);
         comment.setNews(news);
         comment.setUser(user);
         return repository.save(comment);
@@ -48,18 +48,15 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment update(Long commentId, Comment comment) {
-        User user = userService.findById(comment.getUser().getId());
-        News news = newsService.findById(comment.getNews().getId()).getB();
-        Comment updatedComment = new Comment();
-        BeanUtils.copyNotNullProperties(comment, updatedComment);
-        updatedComment.setNews(news);
-        updatedComment.setUser(user);
-        return repository.save(updatedComment);
+        Comment newComment = findById(commentId);
+        BeanUtils.copyNotNullProperties(comment, newComment);
+
+        return repository.save(newComment);
     }
     @Override
     public void checkAccessByUser(Long userId, Long commentId) {
-        int countCommentsByUser = repository.countCommentsByIdAndUserId(commentId, userId);
-        if (countCommentsByUser < 1) {
+        Comment comment = findById(commentId);
+        if (!comment.getUser().getId().equals(userId)) {
             throw new DeniedAccessToOperationException(
                     String
                     .format("У пользователя с id %s отсутствует доступ для редактирования" +
@@ -71,7 +68,7 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public void delete(Long commentId) {
+    public void delete(Long commentId, Long userId) {
         repository.deleteById(commentId);
     }
 }

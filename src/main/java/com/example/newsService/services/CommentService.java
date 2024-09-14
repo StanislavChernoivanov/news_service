@@ -10,11 +10,12 @@ public interface CommentService {
 
     Comment findById(Long commentId);
 
-    Comment save(Comment comment);
+    Comment save(Long userId, Long newsId, Comment comment);
+
+
+    void delete(Long commentId, Long userId);
 
     Comment update(Long commentId, Comment comment);
-
-    void delete(Long commentId);
 
     void checkAccessByUser(Long userId, Long commentId);
 }

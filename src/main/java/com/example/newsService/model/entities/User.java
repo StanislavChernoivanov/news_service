@@ -2,9 +2,12 @@ package com.example.newsService.model.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.LazyGroup;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -23,7 +26,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
-    private List<Comment> commentList = new ArrayList<>();
+    private List<Comment> commentsList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @ToString.Exclude
@@ -32,11 +35,11 @@ public class User {
 
 
     public void addComment(Comment comment) {
-        commentList.add(comment);
+        commentsList.add(comment);
     }
 
     public void removeComment(Long commentId) {
-        commentList = commentList.stream().filter(c -> !c.getId().equals(commentId)).collect(Collectors.toList());
+        commentsList = commentsList.stream().filter(c -> !c.getId().equals(commentId)).collect(Collectors.toList());
     }
 
     public void addNews(News news) {

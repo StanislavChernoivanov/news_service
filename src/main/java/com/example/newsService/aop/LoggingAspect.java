@@ -28,7 +28,7 @@ public class LoggingAspect {
         log.info(MessageFormat.format("Началось выполнение метода {0}", joinPoint.getSignature()));
     }
 
-    @After("callAtMyServicePublic")
+    @After("callAtMyServicePublic()")
     public void loggingAfter(JoinPoint joinPoint) {
         log.info(MessageFormat.format("Закончилось выполнение метода {0}", joinPoint.toString()));
     }

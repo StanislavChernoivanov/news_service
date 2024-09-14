@@ -8,9 +8,6 @@ import lombok.Data;
 
 @Data
 public class UpsertNewsRequest {
-    @NotNull(message = "ID пользователя должно быть указано")
-    @Positive(message = "ID пользователя должно быть не менее 1")
-    private Long userId;
 
     @NotNull(message = "ID категории должно быть указано")
     @Positive(message = "ID категории должно быть не менее 1")

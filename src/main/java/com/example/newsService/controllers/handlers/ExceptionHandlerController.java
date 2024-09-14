@@ -1,5 +1,6 @@
 package com.example.newsService.controllers.handlers;
 
+import com.example.newsService.exceptions.AttemptAddingNotUniqueElementException;
 import com.example.newsService.exceptions.DeniedAccessToOperationException;
 import com.example.newsService.exceptions.EntityNotFoundException;
 import com.example.newsService.web.model.toResponse.ErrorResponse;
@@ -51,16 +52,13 @@ public class ExceptionHandlerController {
                 body(new ErrorResponse(ex.getLocalizedMessage()));
     }
 
-//    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
-//    public ResponseEntity<ErrorResponse> notValid(SQLIntegrityConstraintViolationException ex) {
-//        ex.
-//        BindingResult bindingResult = ex.getBindingResult();
-//        List<String> errorMessages = bindingResult.getAllErrors().
-//                stream().
-//                map(DefaultMessageSourceResolvable::getDefaultMessage).
-//                toList();
-//        String errorMessage = String.join("; ", errorMessages);
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).
-//                body(new ErrorResponse(errorMessage));
-//    }
+    @ExceptionHandler(AttemptAddingNotUniqueElementException.class)
+    public ResponseEntity<ErrorResponse> notUniqueEntity(AttemptAddingNotUniqueElementException ex) {
+        log.error("Попытка добавить в базу данных не уникальный элемент", ex);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                body(new ErrorResponse(ex.getLocalizedMessage()));
+    }
+
+
 }
