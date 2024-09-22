@@ -1,8 +1,5 @@
 package com.example.newsService.aop;
 
-import com.example.newsService.controllers.CommentController;
-import com.example.newsService.web.model.fromRequest.UpsertCommentRequest;
-import com.example.newsService.web.model.fromRequest.UpsertNewsRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -21,7 +18,8 @@ import java.text.MessageFormat;
 public class LoggingAspect {
 
     @Pointcut("execution(public * com.example.newsService.controllers.*(..))")
-    public void callAtMyServicePublic() { }
+    public void callAtMyServicePublic() {
+    }
 
     @Before("callAtMyServicePublic()")
     public void loggingBefore(JoinPoint joinPoint) {

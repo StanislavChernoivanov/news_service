@@ -27,6 +27,7 @@ public class UserServiceImpl implements UserService {
     private final CommentRepository commentRepository;
 
     private final NewsCategoryService categoryService;
+
     @Override
     @Transactional
     public List<User> findAll(RequestPageableModel model) {
@@ -71,7 +72,7 @@ public class UserServiceImpl implements UserService {
 
 
     private List<News> getUpdatedUser(List<News> newsList) {
-        newsList.forEach(n ->  {
+        newsList.forEach(n -> {
             n.setCommentsAmount(commentRepository.countByNewsId(n.getId()));
             n.setCategory(n.getNewsCategory().getCategory());
         });

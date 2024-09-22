@@ -2,12 +2,9 @@ package com.example.newsService.model.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.LazyGroup;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data

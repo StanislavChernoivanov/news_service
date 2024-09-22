@@ -1,0 +1,18 @@
+{
+  "newsResponseList": [
+    {
+      "id": 1,
+      "header": "news",
+      "description": "news",
+      "category": "sport",
+      "commentsAmount": 1
+    },
+    {
+      "id": 2,
+      "header": "news1",
+      "description": "news1",
+      "category": "notsport",
+      "commentsAmount": 1
+    }
+  ]
+}

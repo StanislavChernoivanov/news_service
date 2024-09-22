@@ -14,6 +14,7 @@ import java.util.List;
 public interface UserMapper {
 
     User requestToUser(UpsertUserRequest upsertUserRequest);
+
     @Mapping(source = "userId", target = "id")
     User requestToUser(Long userId, UpsertUserRequest upsertUserRequest);
 
@@ -21,7 +22,7 @@ public interface UserMapper {
 
     List<UserResponse> userListToResponseList(List<User> users);
 
-    default UserListResponse userListToUserResponseList(List<User> users){
+    default UserListResponse userListToUserResponseList(List<User> users) {
         UserListResponse userListResponse = new UserListResponse();
         userListResponse.setUsers(userListToResponseList(users));
         return userListResponse;

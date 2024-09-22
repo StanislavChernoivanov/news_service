@@ -1,5 +1,7 @@
 
 spring:
+  active:
+    profiles: test
   main:
     allow-circular-references: true
   jpa:

@@ -8,17 +8,13 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Data
@@ -46,9 +42,10 @@ public class ExceptionHandlerController {
 
     @ExceptionHandler(DeniedAccessToOperationException.class)
     public ResponseEntity<ErrorResponse> notAccess(DeniedAccessToOperationException ex) {
-        log.error("Отсутствует доступ для редактирования или удаления новости", ex);
+        log.error("У пользователя отсутствует доступ" +
+                " для редактирования или удаления этой новости", ex);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).
                 body(new ErrorResponse(ex.getLocalizedMessage()));
     }
 

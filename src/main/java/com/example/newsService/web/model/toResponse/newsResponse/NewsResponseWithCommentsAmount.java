@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class NewsResponseWithCommentsAmount extends NewsResponse {
 
-        private Integer commentsAmount;
+    private Integer commentsAmount;
 
 }

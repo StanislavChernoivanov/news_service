@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewsResponseWithCommentsList extends NewsResponse{
+public class NewsResponseWithCommentsList extends NewsResponse {
 
 
     private List<CommentResponse> commentsList;

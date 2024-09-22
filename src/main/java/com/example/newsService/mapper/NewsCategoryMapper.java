@@ -14,6 +14,7 @@ import java.util.List;
 public interface NewsCategoryMapper {
 
     NewsCategory requestToNewsCategory(UpsertNewsCategoryRequest upsertNewsCategoryRequest);
+
     @Mapping(source = "newsCategoryId", target = "id")
     NewsCategory requestToNewsCategory(Long newsCategoryId, UpsertNewsCategoryRequest upsertNewsCategoryRequest);
 
@@ -22,7 +23,7 @@ public interface NewsCategoryMapper {
     List<NewsCategoryResponse> newsCategoryListToResponseList(List<NewsCategory> newsCategories);
 
     default NewsCategoryListResponse newsCategoryListToNewsCategoryResponseList
-            (List<NewsCategory> newsCategories){
+            (List<NewsCategory> newsCategories) {
         NewsCategoryListResponse newsCategoryListResponse =
                 new NewsCategoryListResponse();
         newsCategoryListResponse.setNewsCategories(

@@ -9,10 +9,12 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
+
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CommentMapper {
 
     Comment requestToComment(UpsertCommentRequest upsertCommentRequest);
+
     @Mapping(source = "commentId", target = "id")
     Comment requestToComment(Long commentId, UpsertCommentRequest upsertCommentRequest);
 
@@ -20,7 +22,7 @@ public interface CommentMapper {
 
     List<CommentResponse> commentListToResponseList(List<Comment> comments);
 
-    default CommentListResponse commentListToCommentResponseList(List<Comment> comments){
+    default CommentListResponse commentListToCommentResponseList(List<Comment> comments) {
         CommentListResponse commentListResponse = new CommentListResponse();
         commentListResponse.setCommentList(commentListToResponseList(comments));
         return commentListResponse;

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -53,18 +54,17 @@ public class CommentServiceImpl implements CommentService {
 
         return repository.save(newComment);
     }
+
     @Override
     public void checkAccessByUser(Long userId, Long commentId) {
         Comment comment = findById(commentId);
         if (!comment.getUser().getId().equals(userId)) {
             throw new DeniedAccessToOperationException(
                     String
-                    .format("У пользователя с id %s отсутствует доступ для редактирования" +
-                    "или удаления данного коментария", userId));
+                            .format("У пользователя с id %s отсутствует доступ для редактирования" +
+                                    "или удаления данного коментария", userId));
         }
     }
-
-
 
 
     @Override

@@ -1,16 +1,14 @@
 package com.example.newsService.model.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Data
 @Entity
 @Table(name = "comments")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

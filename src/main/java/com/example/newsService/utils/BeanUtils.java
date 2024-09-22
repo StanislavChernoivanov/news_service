@@ -11,7 +11,7 @@ public class BeanUtils {
     public void copyNotNullProperties(Object source, Object destination) {
         Class<?> clazz = source.getClass();
         Field[] fields = clazz.getDeclaredFields();
-        for(Field field : fields) {
+        for (Field field : fields) {
             field.setAccessible(true);
             Object value = field.get(source);
 

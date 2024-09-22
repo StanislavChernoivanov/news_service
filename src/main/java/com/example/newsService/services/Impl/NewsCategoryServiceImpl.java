@@ -8,19 +8,18 @@ import com.example.newsService.model.repositories.CommentRepository;
 import com.example.newsService.model.repositories.NewsCategoryRepository;
 import com.example.newsService.model.repositories.specifications.NewsCategorySpecification;
 import com.example.newsService.services.NewsCategoryService;
-import com.example.newsService.services.NewsService;
 import com.example.newsService.web.model.fromRequest.RequestPageableModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -29,6 +28,7 @@ public class NewsCategoryServiceImpl implements NewsCategoryService {
     private final NewsCategoryRepository repository;
 
     private final CommentRepository commentRepository;
+
     @Override
     @Transactional
     public List<NewsCategory> findAll(RequestPageableModel model) {
@@ -60,9 +60,9 @@ public class NewsCategoryServiceImpl implements NewsCategoryService {
                 NewsCategorySpecification.byNewsCategory(newsCategory.getCategory())
         );
 
-        if(!newsCategoryFromDB.isEmpty()) throw new AttemptAddingNotUniqueElementException(
-            MessageFormat.format("Категория новостей - {0} уже существует"
-                    , newsCategory.getCategory()));
+        if (!newsCategoryFromDB.isEmpty()) throw new AttemptAddingNotUniqueElementException(
+                MessageFormat.format("Категория новостей - {0} уже существует"
+                        , newsCategory.getCategory()));
 
         newsCategory = repository.save(newsCategory);
         return repository.save(newsCategory);
@@ -76,7 +76,7 @@ public class NewsCategoryServiceImpl implements NewsCategoryService {
     private List<News> withoutComments(NewsCategory c) {
         List<News> newsListOfEachCategory = c.getNewsList();
         List<News> newsListWithoutLazyComments = new ArrayList<>(newsListOfEachCategory.size());
-        for(News news : newsListOfEachCategory) {
+        for (News news : newsListOfEachCategory) {
             int commentsAmountOfEachNews = commentRepository.countByNewsId(news.getId());
             newsListWithoutLazyComments.add(News.builder().id(news.getId())
                     .header(news.getHeader()).description(news.getDescription())
@@ -88,7 +88,6 @@ public class NewsCategoryServiceImpl implements NewsCategoryService {
         }
         return newsListWithoutLazyComments;
     }
-
 
 
 }

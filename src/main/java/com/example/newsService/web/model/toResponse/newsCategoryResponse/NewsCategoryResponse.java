@@ -1,6 +1,5 @@
 package com.example.newsService.web.model.toResponse.newsCategoryResponse;
 
-import com.example.newsService.web.model.toResponse.newsResponse.NewsResponse;
 import com.example.newsService.web.model.toResponse.newsResponse.NewsResponseWithCommentsAmount;
 import lombok.AllArgsConstructor;
 import lombok.Data;

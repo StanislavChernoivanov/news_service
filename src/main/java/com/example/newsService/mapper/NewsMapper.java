@@ -3,7 +3,6 @@ package com.example.newsService.mapper;
 import com.example.newsService.model.entities.News;
 import com.example.newsService.web.model.fromRequest.UpsertNewsRequest;
 import com.example.newsService.web.model.toResponse.newsResponse.NewsListResponse;
-import com.example.newsService.web.model.toResponse.newsResponse.NewsResponse;
 import com.example.newsService.web.model.toResponse.newsResponse.NewsResponseWithCommentsAmount;
 import com.example.newsService.web.model.toResponse.newsResponse.NewsResponseWithCommentsList;
 import org.mapstruct.Mapper;

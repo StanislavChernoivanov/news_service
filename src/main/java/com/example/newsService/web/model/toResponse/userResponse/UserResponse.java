@@ -1,11 +1,9 @@
 package com.example.newsService.web.model.toResponse.userResponse;
 
 import com.example.newsService.web.model.toResponse.commentResponse.CommentResponse;
-import com.example.newsService.web.model.toResponse.newsResponse.NewsResponse;
 import com.example.newsService.web.model.toResponse.newsResponse.NewsResponseWithCommentsAmount;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data

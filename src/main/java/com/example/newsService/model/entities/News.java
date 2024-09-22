@@ -3,7 +3,6 @@ package com.example.newsService.model.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -51,7 +50,6 @@ public class News {
 
     @Transient
     private Long categoryId;
-
 
 
     public void addComment(Comment comment) {

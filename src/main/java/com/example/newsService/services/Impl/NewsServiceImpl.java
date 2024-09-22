@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class NewsServiceImpl implements NewsService {
@@ -94,7 +95,7 @@ public class NewsServiceImpl implements NewsService {
         Page<News> newsPage = newsRepository.findAll(
                 NewsSpecification.withFilter(userId, newsCategoryId),
                 PageRequest.of(model.getPageNumber(),
-                                model.getPageSize()));
+                        model.getPageSize()));
 
         return updateNewsPage(newsPage).stream().toList();
     }
@@ -106,8 +107,8 @@ public class NewsServiceImpl implements NewsService {
         if (!news.getUser().getId().equals(userId)) {
             throw new DeniedAccessToOperationException(
                     String.format(
-                    "У пользователя с id %s отсутствует доступ для редактирования " +
-                    "или удаления данной новости", userId));
+                            "У пользователя с id %s отсутствует доступ для редактирования " +
+                                    "или удаления данной новости", userId));
         }
     }
 
