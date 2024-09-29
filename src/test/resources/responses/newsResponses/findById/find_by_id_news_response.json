@@ -1,0 +1,12 @@
+{
+  "id": 1,
+  "header": "news",
+  "description": "news",
+  "category": "sport",
+  "commentsList": [
+    {
+      "id": 1,
+      "comment": "comment"
+    }
+  ]
+}

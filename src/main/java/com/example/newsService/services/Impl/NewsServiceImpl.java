@@ -114,9 +114,13 @@ public class NewsServiceImpl implements NewsService {
 
 
     private Page<News> updateNewsPage(Page<News> newsPage) {
-        newsPage.forEach(news -> news.setCommentsAmount(
-                commentRepository.countByNewsId(news.getId())));
-        newsPage.forEach(n -> n.setCategory(n.getNewsCategory().getCategory()));
+        newsPage.forEach(news -> {
+            news.setCommentsAmount(
+            commentRepository.countByNewsId(news.getId()));
+            String category = news.getNewsCategory().getCategory();
+            news.setCategory(category);
+        });
+
         return newsPage;
     }
 }

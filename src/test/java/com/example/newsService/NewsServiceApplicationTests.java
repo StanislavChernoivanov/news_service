@@ -15,29 +15,37 @@ import com.example.newsService.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Supplier;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
+@Testcontainers
+@Sql("classpath:init.sql")
 public class NewsServiceApplicationTests {
 	@LocalServerPort
-	private Integer port;
+	protected Integer port;
 
 	public static PostgreSQLContainer<?> container
-			= new PostgreSQLContainer<>("postgres:14");
+			= new PostgreSQLContainer<>("postgres:17rc1");
 	@Autowired
 	protected CommentService commentService;
-	@Autowired
 
+	@Autowired
 	protected NewsService newsService;
 	@Autowired
 	protected NewsCategoryService newsCategoryService;
@@ -48,7 +56,7 @@ public class NewsServiceApplicationTests {
 	@Autowired
 	protected NewsRepository newsRepository;
 	@Autowired
-	protected NewsCategoryRepository newsCategory;
+	protected NewsCategoryRepository newsCategoryRepository;
 	@Autowired
 	protected UserRepository userRepository;
 
@@ -58,8 +66,6 @@ public class NewsServiceApplicationTests {
 	@Autowired
 	protected ObjectMapper objectMapper;
 
-	@Autowired
-	protected TestRestTemplate template;
 
 	@BeforeAll
 	public static void beforeAll() {
@@ -78,6 +84,7 @@ public class NewsServiceApplicationTests {
 	}
 
 	@BeforeEach
+	@Transactional
 	public void fillingDatabase() {
 		User user = User.builder().name("user").surname("user").build();
 		User user1 = User.builder().name("user1").surname("user1").build();
@@ -89,19 +96,20 @@ public class NewsServiceApplicationTests {
 				.createAt(Instant.now()).build();
 		Comment comment = Comment.builder().comment("comment").build();
 		Comment comment1 = Comment.builder().comment("comment1").build();
-		news.setUser(userService.save(user));
-		news1.setUser(userService.save(user1));
-		news.setNewsCategory(newsCategoryService.save(newsCategory));
-		news.setNewsCategory(newsCategoryService.save(newsCategory1));
-		comment.setNews(newsService.save(news, user.getId(), newsCategory.getId()));
-		comment1.setNews(newsService.save(news1, user1.getId(), newsCategory1.getId()));
+		news.setUser(userRepository.save(user));
+		news1.setUser(userRepository.save(user1));
+		news.setNewsCategory(newsCategoryRepository.save(newsCategory));
+		news1.setNewsCategory(newsCategoryRepository.save(newsCategory1));
+		comment.setNews(newsRepository.save(news));
+		comment1.setNews(newsRepository.save(news1));
 		commentRepository.saveAll(List.of(comment, comment1));
 	}
 
 	@AfterEach
+	@Transactional
 	public void clearDatabase() {
 		userRepository.deleteAll();
-		newsCategory.deleteAll();
+		newsCategoryRepository.deleteAll();
 	}
 
 

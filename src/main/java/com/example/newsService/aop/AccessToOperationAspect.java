@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @RequiredArgsConstructor
-@Profile("test")
+//@Profile({"test", "prod"})
 public class AccessToOperationAspect {
 
     private final NewsService newsService;

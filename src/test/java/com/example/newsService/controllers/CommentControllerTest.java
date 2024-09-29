@@ -1,6 +1,5 @@
 package com.example.newsService.controllers;
 
-import com.example.newsService.AbstractTestController;
 import com.example.newsService.StringTestUtil;
 import com.example.newsService.mapper.CommentMapper;
 import com.example.newsService.model.entities.Comment;

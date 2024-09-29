@@ -25,7 +25,7 @@ public class ExceptionHandlerController {
         log.error("Ошибка при попытке получить сущность", ex);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).
-                body(new ErrorResponse(ex.getLocalizedMessage()));
+                body(new ErrorResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

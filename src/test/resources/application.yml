@@ -1,0 +1,11 @@
+spring:
+#  jpa:
+#    generate-ddl: true
+  datasource:
+    hikari:
+      schema: news_service_schema
+      connection-ini-sql: CREATE SCHEMA IF NOT EXISTS news_service_schema
+
+logging:
+  level:
+    root: info

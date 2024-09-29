@@ -1,4 +1,4 @@
-package com.example.newsService;
+package com.example.newsService.controllers;
 
 import com.example.newsService.model.entities.Comment;
 import com.example.newsService.model.entities.News;
