@@ -58,8 +58,8 @@ public class NewsServiceImpl implements NewsService {
 
 
     @Override
-    public News save(News news, Long userId, Long newsCategoryId) {
-        User user = userService.findById(userId);
+    public News save(News news, String username, Long newsCategoryId) {
+        User user = userService.findByUsername(username);
         NewsCategory newsCategory = newsCategoryService.findById(newsCategoryId);
         news.setUser(user);
         news.setNewsCategory(newsCategory);
@@ -68,8 +68,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    @Transactional
-    public News update(Long newsId, Long userId, News news) {
+    public News update(Long newsId, News news) {
         News newNews = findById(newsId);
         BeanUtils.copyNotNullProperties(news, newNews);
         newNews.setCategory(newNews.getNewsCategory().getCategory());
@@ -85,30 +84,32 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public List<News> filterBy(
-            Long userId,
+            String username,
             Long newsCategoryId,
             RequestPageableModel model) {
 
         newsCategoryService.findById(newsCategoryId);
-        userService.findById(userId);
+        User user = userService.findByUsername(username);
 
         Page<News> newsPage = newsRepository.findAll(
-                NewsSpecification.withFilter(userId, newsCategoryId),
+                NewsSpecification.withFilter(user.getId(), newsCategoryId),
                 PageRequest.of(model.getPageNumber(),
                         model.getPageSize()));
 
         return updateNewsPage(newsPage).stream().toList();
     }
 
+
+
     @Override
-    @Transactional
-    public void checkAccessByUser(Long userId, Long newsId) {
+    public void checkAccessByUser(String username, Long newsId) {
+        User user = userService.findByUsername(username);
         News news = findById(newsId);
-        if (!news.getUser().getId().equals(userId)) {
+
+        if (!user.getId().equals(news.getUser().getId())) {
             throw new DeniedAccessToOperationException(
                     String.format(
-                            "У пользователя с id %s отсутствует доступ для редактирования " +
-                                    "или удаления данной новости", userId));
+                            "У пользователя с именем %s отсутствует доступ к данному ресурсу", username));
         }
     }
 

@@ -39,8 +39,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment save(Long userId, Long newsId, Comment comment) {
-        User user = userService.findById(userId);
+    public Comment save(String username, Long newsId, Comment comment) {
+        User user = userService.findByUsername(username);
         News news = newsService.findById(newsId);
         comment.setNews(news);
         comment.setUser(user);
@@ -55,20 +55,21 @@ public class CommentServiceImpl implements CommentService {
         return repository.save(newComment);
     }
 
+
     @Override
-    public void checkAccessByUser(Long userId, Long commentId) {
+    public void checkAccessByUser(String username, Long commentId) {
+        User user = userService.findByUsername(username);
         Comment comment = findById(commentId);
-        if (!comment.getUser().getId().equals(userId)) {
+
+        if(!user.getId().equals(comment.getUser().getId())) {
             throw new DeniedAccessToOperationException(
-                    String
-                            .format("У пользователя с id %s отсутствует доступ для редактирования" +
-                                    "или удаления данного коментария", userId));
+                    String.format(
+                            "У пользователя с именем %s отсутствует доступ к данному ресурсу", username));
         }
     }
 
-
     @Override
-    public void delete(Long commentId, Long userId) {
+    public void delete(Long commentId) {
         repository.deleteById(commentId);
     }
 }

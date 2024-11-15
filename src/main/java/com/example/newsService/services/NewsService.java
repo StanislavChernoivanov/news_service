@@ -11,17 +11,17 @@ public interface NewsService {
 
     News findById(Long newsId);
 
-    News save(News news, Long userId, Long newsCategoryId);
+    News save(News news, String username, Long newsCategoryId);
 
-    News update(Long newsId, Long userId, News news);
+    News update(Long newsId, News news);
 
     void delete(Long newsId);
 
     List<News> filterBy(
-            Long userId,
+            String username,
             Long newsCategoryId,
             RequestPageableModel model);
 
-    void checkAccessByUser(Long userId, Long newsId);
+    void checkAccessByUser(String username, Long newsId);
 
 }

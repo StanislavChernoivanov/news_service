@@ -1,6 +1,6 @@
 package com.example.newsService.controllers;
 
-import com.example.newsService.aop.Accessible;
+import com.example.newsService.aop.CheckAccess;
 import com.example.newsService.mapper.CommentMapper;
 import com.example.newsService.model.entities.Comment;
 import com.example.newsService.services.CommentService;
@@ -18,6 +18,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -45,6 +47,7 @@ public class CommentController {
             )
     })
     public ResponseEntity<CommentListResponse> findAllByNewsId(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam Long newsId) {
         return ResponseEntity.ok(
                 commentMapper.commentListToCommentResponseList(
@@ -52,6 +55,9 @@ public class CommentController {
                 )
         );
     }
+
+
+
 
 
     @GetMapping("/{id}")
@@ -76,11 +82,15 @@ public class CommentController {
                     )
             )
     })
-    public ResponseEntity<CommentResponse> findById(@PathVariable("id") Long commentId) {
+    public ResponseEntity<CommentResponse> findById(@AuthenticationPrincipal UserDetails userDetails,
+                                                    @PathVariable("id") Long commentId) {
         return ResponseEntity.ok(
                 commentMapper.commentToResponse(commentService.findById(commentId))
         );
     }
+
+
+
 
 
     @PostMapping
@@ -97,16 +107,22 @@ public class CommentController {
                     )
             )
     })
-    public ResponseEntity<CommentResponse> create(Long userId, Long newsId,
+    public ResponseEntity<CommentResponse> create(@AuthenticationPrincipal UserDetails userDetails,
+                                                  Long newsId,
                                                   @RequestBody @Valid UpsertCommentRequest upsertCommentRequest) {
-        Comment comment = commentService.save(userId, newsId,
+        Comment comment = commentService.save(userDetails.getUsername(), newsId,
                 commentMapper.requestToComment(upsertCommentRequest));
         return ResponseEntity.status(HttpStatus.CREATED).
                 body(commentMapper.commentToResponse(comment));
     }
 
+
+
+
+
+
     @PutMapping("/{id}")
-    @Accessible
+    @CheckAccess
     @Operation(
             summary = "Update comment by id",
             description = "Update comment by id, using user id for access check return comment",
@@ -128,7 +144,7 @@ public class CommentController {
                     )
             ),
             @ApiResponse(
-                    responseCode = "406",
+                    responseCode = "401",
                     content = @Content(
                             schema = @Schema(implementation = ErrorResponse.class),
                             mediaType = "application/json"
@@ -136,8 +152,8 @@ public class CommentController {
             )
     })
     public ResponseEntity<CommentResponse> update(
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("id") Long commentId,
-            @RequestParam Long userId,
             @RequestBody @Valid UpsertCommentRequest upsertCommentRequest) {
         Comment comment = commentService.update(
                 commentId,
@@ -145,8 +161,14 @@ public class CommentController {
         return ResponseEntity.ok(commentMapper.commentToResponse(comment));
     }
 
+
+
+
+
+
+
     @DeleteMapping("/{id}")
-    @Accessible
+    @CheckAccess
     @Operation(
             summary = "Delete comment by id",
             description = "Delete comment by id, using user id for access check",
@@ -164,16 +186,16 @@ public class CommentController {
                     )
             ),
             @ApiResponse(
-                    responseCode = "406",
+                    responseCode = "401",
                     content = @Content(
                             schema = @Schema(implementation = ErrorResponse.class),
                             mediaType = "application/json"
                     )
             )
     })
-    public ResponseEntity<Void> delete(@PathVariable("id") Long commentId,
-                                       @RequestParam Long userId) {
-        commentService.delete(commentId, userId);
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal UserDetails userDetails,
+                                       @PathVariable("id") Long commentId) {
+        commentService.delete(commentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

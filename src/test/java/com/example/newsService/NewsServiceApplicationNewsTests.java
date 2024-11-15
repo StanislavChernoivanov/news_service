@@ -3,7 +3,9 @@ package com.example.newsService;
 import com.example.newsService.model.entities.News;
 import com.example.newsService.web.model.fromRequest.RequestPageableModel;
 import com.example.newsService.web.model.fromRequest.UpsertNewsRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.javacrumbs.jsonunit.JsonAssert;
+import org.hibernate.type.format.jackson.JacksonXmlFormatMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +31,7 @@ public class NewsServiceApplicationNewsTests extends NewsServiceApplicationTests
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
+
 
         String expectedResponse = StringTestUtil
                 .readStringFromResource("responses/newsResponses/findAll/find_all_news_response.json");

@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @Entity
@@ -17,8 +16,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String surname;
+
+    private String username;
+
+    private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @ToString.Exclude
@@ -31,19 +32,10 @@ public class User {
     private List<News> newsList = new ArrayList<>();
 
 
-    public void addComment(Comment comment) {
-        commentsList.add(comment);
-    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @Builder.Default
+    private List<Role> roles = new ArrayList<>();
 
-    public void removeComment(Long commentId) {
-        commentsList = commentsList.stream().filter(c -> !c.getId().equals(commentId)).collect(Collectors.toList());
-    }
 
-    public void addNews(News news) {
-        newsList.add(news);
-    }
-
-    public void removeNews(Long newsId) {
-        newsList = newsList.stream().filter(n -> !n.getId().equals(newsId)).collect(Collectors.toList());
-    }
 }

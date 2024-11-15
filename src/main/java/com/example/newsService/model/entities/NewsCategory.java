@@ -29,13 +29,4 @@ public class NewsCategory {
     private List<News> newsList = new ArrayList<>();
 
 
-//    public void addNews(News news) {
-//        newsList.add(news);
-//    }
-//
-//    public void removeNews(Long newsId) {
-//        newsList = newsList.stream().filter(n -> !n.getId().equals(newsId)).collect(Collectors.toList());
-//    }
-
-
 }

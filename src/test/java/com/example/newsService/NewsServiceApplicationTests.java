@@ -75,6 +75,8 @@ public class NewsServiceApplicationTests {
 	public static void afterAll() {
 		container.stop();
 	}
+
+
 	@DynamicPropertySource
 	public static void configureProperties(DynamicPropertyRegistry registry) {
 		registry.add("spring.datasource.url", container::getJdbcUrl);

@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
@@ -19,8 +18,8 @@ import java.util.List;
 @RestControllerAdvice
 @Data
 @Slf4j
-public class ExceptionHandlerController {
-    @ExceptionHandler(EntityNotFoundException.class)
+public class ExceptionHandler {
+    @org.springframework.web.bind.annotation.ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<com.example.newsService.web.model.toResponse.ErrorResponse> notFound(EntityNotFoundException ex) {
         log.error("Ошибка при попытке получить сущность", ex);
 
@@ -28,7 +27,7 @@ public class ExceptionHandlerController {
                 body(new ErrorResponse(ex.getMessage()));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> notValid(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
         List<String> errorMessages = bindingResult.getAllErrors().
@@ -40,16 +39,16 @@ public class ExceptionHandlerController {
                 body(new ErrorResponse(errorMessage));
     }
 
-    @ExceptionHandler(DeniedAccessToOperationException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(DeniedAccessToOperationException.class)
     public ResponseEntity<ErrorResponse> notAccess(DeniedAccessToOperationException ex) {
         log.error("У пользователя отсутствует доступ" +
                 " для редактирования или удаления этой новости", ex);
 
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).
                 body(new ErrorResponse(ex.getLocalizedMessage()));
     }
 
-    @ExceptionHandler(AttemptAddingNotUniqueElementException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(AttemptAddingNotUniqueElementException.class)
     public ResponseEntity<ErrorResponse> notUniqueEntity(AttemptAddingNotUniqueElementException ex) {
         log.error("Попытка добавить в базу данных не уникальный элемент", ex);
 

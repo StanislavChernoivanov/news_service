@@ -1,13 +1,12 @@
 package com.example.newsService.controllers;
 
-import com.example.newsService.aop.Accessible;
+import com.example.newsService.aop.CheckAccess;
 import com.example.newsService.mapper.NewsMapper;
 import com.example.newsService.model.entities.News;
 import com.example.newsService.services.NewsService;
 import com.example.newsService.web.model.fromRequest.RequestPageableModel;
 import com.example.newsService.web.model.fromRequest.UpsertNewsRequest;
 import com.example.newsService.web.model.toResponse.ErrorResponse;
-import com.example.newsService.web.model.toResponse.newsCategoryResponse.NewsCategoryResponse;
 import com.example.newsService.web.model.toResponse.newsResponse.NewsListResponse;
 import com.example.newsService.web.model.toResponse.newsResponse.NewsResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,11 +15,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,7 +36,8 @@ public class NewsController {
     private final NewsMapper mapper;
 
 
-    @GetMapping("/filter")@Operation(
+    @GetMapping("/filter")
+    @Operation(
             summary = "Get all news by user id and news category id",
             description = "Get all news by user id and news category id" +
                     ", return news list with comments amount",
@@ -52,11 +53,12 @@ public class NewsController {
             )
     })
     public ResponseEntity<NewsListResponse> filterBy(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam Long userId,
             @RequestParam Long newsCategoryId,
             @RequestBody RequestPageableModel model) {
         List<News> newsList = newsService.filterBy(
-                userId,
+                userDetails.getUsername(),
                 newsCategoryId,
                 model);
         return ResponseEntity.ok(
@@ -82,7 +84,8 @@ public class NewsController {
                     )
             )
     })
-    public ResponseEntity<NewsListResponse> findAll(@RequestBody @Valid RequestPageableModel requestPageableModel) {
+    public ResponseEntity<NewsListResponse> findAll(@AuthenticationPrincipal UserDetails userDetails,
+                                                    @RequestBody @Valid RequestPageableModel requestPageableModel) {
 
         List<News> newsList = newsService.findAll(requestPageableModel);
         return ResponseEntity.ok(mapper.newsListToNewsResponseList(newsList));
@@ -113,7 +116,8 @@ public class NewsController {
 
             )
     })
-    public ResponseEntity<NewsResponse> findById(@PathVariable("id") Long newsId) {
+    public ResponseEntity<NewsResponse> findById(@AuthenticationPrincipal UserDetails userDetails,
+                                                 @PathVariable("id") Long newsId) {
 
         return ResponseEntity.ok(
                 mapper.newsToResponse(newsService.findById(newsId))
@@ -138,11 +142,11 @@ public class NewsController {
                     )
             )
     })
-    public ResponseEntity<NewsResponse> create(@RequestParam("userId") Long userId,
+    public ResponseEntity<NewsResponse> create(@AuthenticationPrincipal UserDetails userDetails,
                                                @RequestBody @Valid UpsertNewsRequest upsertNewsRequest) {
         News news = newsService.save(
                 mapper.requestToNews(upsertNewsRequest)
-                , userId
+                , userDetails.getUsername()
                 , upsertNewsRequest.getCategoryId());
         return ResponseEntity.status(HttpStatus.CREATED).
                 body(mapper.newsToResponse(news));
@@ -152,7 +156,7 @@ public class NewsController {
 
 
     @PutMapping("/{id}")
-    @Accessible
+    @CheckAccess
     @Operation(
             summary = "Update news by id",
             description = "Update news by id, using user id for access check" +
@@ -175,7 +179,7 @@ public class NewsController {
 
             ),
             @ApiResponse(
-                    responseCode = "406",
+                    responseCode = "401",
                     content = @Content(
                             schema = @Schema(implementation = ErrorResponse.class),
                             mediaType = "application/json"
@@ -183,9 +187,10 @@ public class NewsController {
             )
     })
     public ResponseEntity<NewsResponse> update(
-            @PathVariable("id") Long newsId, @RequestParam Long userId,
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("id") Long newsId,
             @RequestBody @Valid UpsertNewsRequest upsertNewsRequest) {
-        News news = newsService.update(newsId, userId,
+        News news = newsService.update(newsId,
                 mapper.requestToNews(newsId, upsertNewsRequest));
         return ResponseEntity.ok(mapper.newsToResponse(news));
     }
@@ -194,7 +199,7 @@ public class NewsController {
 
 
     @DeleteMapping("/{id}")
-    @Accessible
+    @CheckAccess
     @Operation(
             summary = "Delete news by id",
             description = "Delete news by id, using user id for access check",
@@ -212,15 +217,15 @@ public class NewsController {
 
             ),
             @ApiResponse(
-                    responseCode = "406",
+                    responseCode = "401",
                     content = @Content(
                             schema = @Schema(implementation = ErrorResponse.class),
                             mediaType = "application/json"
                     )
             )
     })
-    public ResponseEntity<Void> delete(@PathVariable("id") Long newsId,
-                                       @RequestParam Long userId) {
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal UserDetails userDetails,
+                                       @PathVariable("id") Long newsId) {
         newsService.delete(newsId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

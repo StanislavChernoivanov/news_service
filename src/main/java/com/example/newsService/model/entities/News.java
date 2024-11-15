@@ -52,14 +52,4 @@ public class News {
     private Long categoryId;
 
 
-    public void addComment(Comment comment) {
-        commentsList.add(comment);
-    }
-
-
-    public void removeComment(Long commentId) {
-        commentsList = commentsList.stream().filter(c -> !c.getId().equals(commentId)).collect(Collectors.toList());
-    }
-
-
 }

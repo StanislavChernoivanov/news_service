@@ -17,7 +17,7 @@ import java.text.MessageFormat;
 @Slf4j
 public class LoggingAspect {
 
-    @Pointcut("execution(public * com.example.newsService.controllers.*(..))")
+    @Pointcut("execution(public * com.example.newsService.controllers.*.*(..))")
     public void callAtMyServicePublic() {
     }
 
@@ -28,7 +28,7 @@ public class LoggingAspect {
 
     @After("callAtMyServicePublic()")
     public void loggingAfter(JoinPoint joinPoint) {
-        log.info(MessageFormat.format("Закончилось выполнение метода {0}", joinPoint.toString()));
+        log.info(MessageFormat.format("Закончилось выполнение метода {0}", joinPoint.getSignature()));
     }
 
 }

@@ -1,6 +1,8 @@
 package com.example.newsService.controllers;
 
+import com.example.newsService.aop.CheckAccess;
 import com.example.newsService.mapper.UserMapper;
+import com.example.newsService.model.entities.RoleType;
 import com.example.newsService.model.entities.User;
 import com.example.newsService.services.UserService;
 import com.example.newsService.web.model.fromRequest.RequestPageableModel;
@@ -18,6 +20,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,16 +51,20 @@ public class UserController {
             )
     })
     public ResponseEntity<UserListResponse> findAll
-            (@RequestBody @Valid RequestPageableModel model) {
+            (@AuthenticationPrincipal UserDetails userDetails,
+             @RequestBody @Valid RequestPageableModel model) {
+
+        List<User> users = service.findAll(model);
 
         return ResponseEntity.ok(
-                mapper.userListToUserResponseList(
-                        service.findAll(model)
-                )
+                UserListResponse.setRoleTypes(mapper.userListToUserResponseList(
+                        service.findAll(model))
+                , users.stream().map(User::getRoles).toList())
         );
     }
 
     @GetMapping("/{id}")
+    @CheckAccess
     @Operation(
             summary = "Get user by id",
             description = "Get user by id, return user with news list",
@@ -78,9 +86,13 @@ public class UserController {
                     )
             )
     })
-    public ResponseEntity<UserResponse> findById(@PathVariable("id") Long userId) {
+    public ResponseEntity<UserResponse> findById(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("id") Long userId) {
+
+        User user = service.findById(userId);
         return ResponseEntity.ok(
-                mapper.userToResponse(service.findById(userId))
+                UserResponse.setRoleTypes(mapper.userToResponse(user), user.getRoles())
         );
     }
 
@@ -89,8 +101,8 @@ public class UserController {
 
     @PostMapping
     @Operation(
-            summary = "Create user",
-            description = "Create user, return user",
+            summary = "Create new account",
+            description = "Create new account, return new user",
             tags = {"user"}
     )
     @ApiResponses({
@@ -103,11 +115,12 @@ public class UserController {
             )
     })
     public ResponseEntity<UserResponse> create(
-            @RequestBody @Valid UpsertUserRequest upsertUserRequest) {
-        User user = service.save(
-                mapper.requestToUser(upsertUserRequest));
+            @RequestBody @Valid UpsertUserRequest upsertUserRequest,
+            @RequestParam RoleType roleType) {
+        User user = service.createNewAccount(
+                mapper.requestToUser(upsertUserRequest), roleType);
         return ResponseEntity.status(HttpStatus.CREATED).
-                body(mapper.userToResponse(user));
+                body(UserResponse.setRoleTypes(mapper.userToResponse(user), user.getRoles()));
     }
 
 
@@ -115,8 +128,8 @@ public class UserController {
 
     @PutMapping("/{id}")
     @Operation(
-            summary = "Update user by id",
-            description = "Update user by id, return user with news list",
+            summary = "Update user's username and password by id",
+            description = "Update user's username and password by id, return updated user",
             tags = {"user", "user id"}
     )
     @ApiResponses({
@@ -135,9 +148,12 @@ public class UserController {
                     )
             )
     })
+    @CheckAccess
     public ResponseEntity<UserResponse> update(
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("id") Long userId,
             @RequestBody @Valid UpsertUserRequest request) {
+
         User user = service.update(userId,
                 mapper.requestToUser(userId, request));
         return ResponseEntity.ok(mapper.userToResponse(user));
@@ -147,6 +163,7 @@ public class UserController {
 
 
     @DeleteMapping("/{id}")
+    @CheckAccess
     @Operation(
             summary = "Delete user by id",
             description = "Delete user by id",
@@ -164,7 +181,9 @@ public class UserController {
                     )
             )
     })
-    public ResponseEntity<Void> delete(@PathVariable("id") Long userId) {
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal UserDetails userDetails,
+                                           @PathVariable("id") Long userId) {
+
         service.delete(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,9 +30,13 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "NewsCategory V1", description = "NewsCategory API V1")
 public class NewsCategoryController {
 
+
     private final NewsCategoryService newsCategoryService;
 
     private final NewsCategoryMapper mapper;
+
+
+
 
     @GetMapping
     @Operation(
@@ -48,6 +54,7 @@ public class NewsCategoryController {
             )
     })
     public ResponseEntity<NewsCategoryListResponse> findAll(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody @Valid RequestPageableModel model) {
         return ResponseEntity.ok(
                 mapper.newsCategoryListToNewsCategoryResponseList(
@@ -55,6 +62,10 @@ public class NewsCategoryController {
                 )
         );
     }
+
+
+
+
 
     @GetMapping("/{id}")
     @Operation(
@@ -78,11 +89,17 @@ public class NewsCategoryController {
                     )
             )
     })
-    public ResponseEntity<NewsCategoryResponse> findById(@PathVariable("id") Long newsCategoryId) {
+    public ResponseEntity<NewsCategoryResponse> findById(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("id") Long newsCategoryId) {
         return ResponseEntity.ok(
                 mapper.newsCategoryToResponse(newsCategoryService.findById(newsCategoryId))
         );
     }
+
+
+
+
 
 
     @PostMapping
@@ -101,12 +118,18 @@ public class NewsCategoryController {
             )
     })
     public ResponseEntity<NewsCategoryResponse> create(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody @Valid UpsertNewsCategoryRequest upsertNewsCategoryRequest) {
         NewsCategory newsCategory = newsCategoryService.save(
                 mapper.requestToNewsCategory(upsertNewsCategoryRequest));
         return ResponseEntity.status(HttpStatus.CREATED).
                 body(mapper.newsCategoryToResponse(newsCategory));
     }
+
+
+
+
+
 
     @DeleteMapping("/{id}")
     @Operation(
@@ -126,7 +149,9 @@ public class NewsCategoryController {
                     )
             )
     })
-    public ResponseEntity<Void> delete(@PathVariable("id") Long newsCategoryId) {
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("id") Long newsCategoryId) {
         newsCategoryService.delete(newsCategoryId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
