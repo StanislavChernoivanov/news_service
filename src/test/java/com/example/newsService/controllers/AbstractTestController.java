@@ -72,7 +72,7 @@ public abstract class AbstractTestController {
     }
 
     protected User createUser(Long id) {
-        return User.builder().id(id).name("User " + id).surname("User " + id).build();
+        return User.builder().id(id).username("User " + id).build();
     }
 
 
@@ -114,14 +114,13 @@ public abstract class AbstractTestController {
     }
 
     protected UserResponse createUserResponse(Long id,
-                                              String name,
-                                              String surname,
+                                              String username,
                                               CommentResponse commentResponse,
                                               NewsResponseWithCommentsAmount newsResponse) {
         UserResponse userResponse = new UserResponse();
         userResponse.setId(id);
-        userResponse.setName(name);
-        userResponse.setSurname(surname);
+        userResponse.setUsername(username);
+
         if (commentResponse != null) {
             userResponse.getCommentsList().add(commentResponse);
         }

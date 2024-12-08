@@ -8,5 +8,5 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class NewsListResponse {
-    private List<NewsResponseWithCommentsAmount> newsResponseList;
+    private List<NewsResponseWithCommentsAmount> news;
 }

@@ -1,9 +1,11 @@
-package com.example.newsService.services.Impl;
+package com.example.newsService.services.impl;
 
-import com.example.newsService.exceptions.DeniedAccessToOperationException;
-import com.example.newsService.exceptions.EntityNotFoundException;
+import com.example.newsService.configuration.cache.AppCacheProperties;
+import com.example.newsService.exceptions.OperationIsNotAvailableException;
+import com.example.newsService.exceptions.EntityIsNotFoundException;
 import com.example.newsService.model.entities.News;
 import com.example.newsService.model.entities.NewsCategory;
+import com.example.newsService.model.entities.RoleType;
 import com.example.newsService.model.entities.User;
 import com.example.newsService.model.repositories.CommentRepository;
 import com.example.newsService.model.repositories.NewsRepository;
@@ -14,11 +16,15 @@ import com.example.newsService.services.UserService;
 import com.example.newsService.utils.BeanUtils;
 import com.example.newsService.web.model.fromRequest.RequestPageableModel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 @Service
@@ -33,31 +39,44 @@ public class NewsServiceImpl implements NewsService {
 
     private final NewsCategoryService newsCategoryService;
 
+
+
+
     @Override
     @Transactional
+    @Cacheable(
+            cacheNames = AppCacheProperties.CacheNames.NEWS,
+            key = "#model.getPageSize() + #model.getPageNumber()")
     public List<News> findAll(RequestPageableModel model) {
 
         Page<News> newsPage = newsRepository.findAll(
                 PageRequest.of(model.getPageNumber(), model.getPageSize())
         );
+        System.err.println(MessageFormat.format("Класс - {0}: не закэшировано",
+                getClass().getSimpleName()));
 
         return updateNewsPage(newsPage).stream().toList();
     }
 
     @Override
     @Transactional
+    @Cacheable(cacheNames = AppCacheProperties.CacheNames.NEWS_BY_ID)
     public News findById(Long newsId) {
 
         News news = newsRepository.findById(newsId).orElseThrow(() ->
-                new EntityNotFoundException(
+                new EntityIsNotFoundException(
                         String.format("Новость с id %s не найдена", newsId)));
         news.setCategory(news.getNewsCategory().getCategory());
 
+        System.err.println(MessageFormat.format("Класс - {0}: не закэшировано",
+                getClass().getSimpleName()));
         return news;
     }
 
 
     @Override
+    @CacheEvict(cacheNames = AppCacheProperties.CacheNames.NEWS
+    , allEntries = true)
     public News save(News news, String username, Long newsCategoryId) {
         User user = userService.findByUsername(username);
         NewsCategory newsCategory = newsCategoryService.findById(newsCategoryId);
@@ -68,6 +87,15 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = AppCacheProperties.CacheNames.NEWS
+            , allEntries = true),
+            @CacheEvict(cacheNames = AppCacheProperties.CacheNames.NEWS_BY_ID
+            , key = "#newsId"),
+            @CacheEvict(cacheNames = AppCacheProperties.CacheNames.NEWS_BY_USERNAME_AND_CATEGORY_ID
+                    , allEntries = true)
+    })
     public News update(Long newsId, News news) {
         News newNews = findById(newsId);
         BeanUtils.copyNotNullProperties(news, newNews);
@@ -78,11 +106,25 @@ public class NewsServiceImpl implements NewsService {
 
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = AppCacheProperties.CacheNames.NEWS
+                    , allEntries = true),
+            @CacheEvict(cacheNames = AppCacheProperties.CacheNames.NEWS_BY_ID
+                    , key = "#newsId"),
+            @CacheEvict(cacheNames = AppCacheProperties.CacheNames.NEWS_BY_USERNAME_AND_CATEGORY_ID
+            , allEntries = true)
+    })
     public void delete(Long newsId) {
         newsRepository.deleteById(newsId);
     }
 
+
+
+
+
     @Override
+    @Cacheable(cacheNames = AppCacheProperties.CacheNames.NEWS_BY_USERNAME_AND_CATEGORY_ID
+        , key = "#username + #categoryId")
     public List<News> filterBy(
             String username,
             Long newsCategoryId,
@@ -102,12 +144,14 @@ public class NewsServiceImpl implements NewsService {
 
 
     @Override
+    @Transactional
     public void checkAccessByUser(String username, Long newsId) {
         User user = userService.findByUsername(username);
         News news = findById(newsId);
 
-        if (!user.getId().equals(news.getUser().getId())) {
-            throw new DeniedAccessToOperationException(
+        if (user.getRoles().stream().allMatch(r -> r.getAuthority().equals(RoleType.ROLE_USER))
+                && !user.getId().equals(news.getUser().getId())) {
+            throw new OperationIsNotAvailableException(
                     String.format(
                             "У пользователя с именем %s отсутствует доступ к данному ресурсу", username));
         }

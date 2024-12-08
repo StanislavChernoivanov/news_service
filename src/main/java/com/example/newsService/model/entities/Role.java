@@ -20,7 +20,7 @@ public class Role {
     @Enumerated(value = EnumType.STRING)
     private RoleType authority;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "username")
     @ToString.Exclude
     private User user;

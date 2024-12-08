@@ -88,8 +88,8 @@ public class NewsServiceApplicationTests {
 	@BeforeEach
 	@Transactional
 	public void fillingDatabase() {
-		User user = User.builder().name("user").surname("user").build();
-		User user1 = User.builder().name("user1").surname("user1").build();
+		User user = User.builder().username("user").build();
+		User user1 = User.builder().username("user1").build();
 		NewsCategory newsCategory = NewsCategory.builder().category("sport").build();
 		NewsCategory newsCategory1 = NewsCategory.builder().category("notsport").build();
 		News news = News.builder().header("news").description("news")

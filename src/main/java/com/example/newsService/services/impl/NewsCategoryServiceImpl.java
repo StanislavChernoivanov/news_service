@@ -1,7 +1,8 @@
-package com.example.newsService.services.Impl;
+package com.example.newsService.services.impl;
 
-import com.example.newsService.exceptions.AttemptAddingNotUniqueElementException;
-import com.example.newsService.exceptions.EntityNotFoundException;
+import com.example.newsService.configuration.cache.AppCacheProperties;
+import com.example.newsService.exceptions.EntityIsNotUniqueException;
+import com.example.newsService.exceptions.EntityIsNotFoundException;
 import com.example.newsService.model.entities.News;
 import com.example.newsService.model.entities.NewsCategory;
 import com.example.newsService.model.repositories.CommentRepository;
@@ -11,6 +12,9 @@ import com.example.newsService.services.NewsCategoryService;
 import com.example.newsService.web.model.fromRequest.RequestPageableModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -31,36 +35,43 @@ public class NewsCategoryServiceImpl implements NewsCategoryService {
 
     @Override
     @Transactional
+    @Cacheable(cacheNames = AppCacheProperties.CacheNames.NEWS_CATEGORIES,
+        key = "#model.getPageSize() + #model.getPageNumber()")
     public List<NewsCategory> findAll(RequestPageableModel model) {
         Page<NewsCategory> newsCategoryPage = repository.findAll(
                 PageRequest.of(model.getPageNumber(), model.getPageSize())
         );
+        System.err.println(MessageFormat.format("Класс - {0}: не закэшировано",
+                getClass().getSimpleName()));
 
-        newsCategoryPage.stream()
-                .toList()
-                .forEach(c -> c.setNewsList(withoutComments(c)));
-
-        return newsCategoryPage.stream().toList();
+        return newsCategoryPage.stream().peek(c -> c.setNewsList(withoutComments(c))).toList();
     }
 
     @Override
+    @Cacheable(cacheNames = AppCacheProperties.CacheNames.NEWS_CATEGORY_BY_ID)
     public NewsCategory findById(Long newsCategoryId) {
         NewsCategory category = repository.findById(newsCategoryId).orElseThrow(() ->
-                new EntityNotFoundException(
+                new EntityIsNotFoundException(
                         String.format("Категория новостей с id %s не найдена", newsCategoryId)
                 ));
         category.setNewsList(withoutComments(category));
+        System.err.println(MessageFormat.format("Класс - {0}: не закэшировано",
+                getClass().getSimpleName()));
         return category;
     }
 
     @Override
+    @CacheEvict(
+            cacheNames = AppCacheProperties.CacheNames.NEWS_CATEGORIES,
+            allEntries = true
+    )
     public NewsCategory save(NewsCategory newsCategory) {
 
         List<NewsCategory> newsCategoryFromDB = repository.findAll(
                 NewsCategorySpecification.byNewsCategory(newsCategory.getCategory())
         );
 
-        if (!newsCategoryFromDB.isEmpty()) throw new AttemptAddingNotUniqueElementException(
+        if (!newsCategoryFromDB.isEmpty()) throw new EntityIsNotUniqueException(
                 MessageFormat.format("Категория новостей - {0} уже существует"
                         , newsCategory.getCategory()));
 
@@ -69,9 +80,17 @@ public class NewsCategoryServiceImpl implements NewsCategoryService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = AppCacheProperties.CacheNames.NEWS_CATEGORIES
+            , allEntries = true),
+            @CacheEvict(cacheNames = AppCacheProperties.CacheNames.NEWS_CATEGORY_BY_ID
+            , key = "#newsCategoryId")
+    })
     public void delete(Long newsCategoryId) {
         repository.deleteById(newsCategoryId);
     }
+
+
 
     private List<News> withoutComments(NewsCategory c) {
         List<News> newsListOfEachCategory = c.getNewsList();

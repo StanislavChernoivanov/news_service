@@ -1,7 +1,44 @@
+app:
+  redis:
+    enable: true
+  cache:
+    cache-names:
+      - commentsByNewsId
+      - commentById
+      - newsCategories
+      - newsCategoryById
+      - news
+      - newsById
+      - newsByUsernameAndCategoryId
+      - users
+      - userById
+    caches:
+      commentsByNewsId:
+        expiry: 3m
+      commentById:
+        expiry: 3m
+      newsCategories:
+        expiry: 3m
+      newsCategoryById:
+        expiry: 3m
+      news:
+        expiry: 3m
+      newsById:
+        expiry: 3m
+      newsByUsernameAndCategoryId:
+        expiry: 3m
+      users:
+        expiry: 3m
+      userById:
+        expiry: 3m
 
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
   active:
-    profiles: test
+    profiles: default
   main:
     allow-circular-references: true
   jpa:
@@ -12,7 +49,7 @@ spring:
         show_sql: false
         format_sql: false
         hbm2ddl:
-          auto: update
+          auto: create
   datasource:
     username: mysql
     password: mysql

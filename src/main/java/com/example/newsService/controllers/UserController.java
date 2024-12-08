@@ -17,6 +17,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user/")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 @Tag(name = "User V1", description = "User API V1")
 public class UserController {
@@ -35,6 +37,9 @@ public class UserController {
     private final UserService service;
 
     private final UserMapper mapper;
+
+
+
 
     @GetMapping
     @Operation(
@@ -54,14 +59,14 @@ public class UserController {
             (@AuthenticationPrincipal UserDetails userDetails,
              @RequestBody @Valid RequestPageableModel model) {
 
-        List<User> users = service.findAll(model);
-
         return ResponseEntity.ok(
-                UserListResponse.setRoleTypes(mapper.userListToUserResponseList(
-                        service.findAll(model))
-                , users.stream().map(User::getRoles).toList())
+                mapper.userListToUserResponseList(service.findAll(model))
+
         );
     }
+
+
+
 
     @GetMapping("/{id}")
     @CheckAccess
@@ -91,42 +96,14 @@ public class UserController {
             @PathVariable("id") Long userId) {
 
         User user = service.findById(userId);
-        return ResponseEntity.ok(
-                UserResponse.setRoleTypes(mapper.userToResponse(user), user.getRoles())
-        );
-    }
-
-
-
-
-    @PostMapping
-    @Operation(
-            summary = "Create new account",
-            description = "Create new account, return new user",
-            tags = {"user"}
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201",
-                    content = @Content(
-                            schema = @Schema(implementation = UserResponse.class),
-                            mediaType = "application/json"
-                    )
-            )
-    })
-    public ResponseEntity<UserResponse> create(
-            @RequestBody @Valid UpsertUserRequest upsertUserRequest,
-            @RequestParam RoleType roleType) {
-        User user = service.createNewAccount(
-                mapper.requestToUser(upsertUserRequest), roleType);
-        return ResponseEntity.status(HttpStatus.CREATED).
-                body(UserResponse.setRoleTypes(mapper.userToResponse(user), user.getRoles()));
+        return ResponseEntity.ok(mapper.userToResponse(user));
     }
 
 
 
 
     @PutMapping("/{id}")
+    @CheckAccess
     @Operation(
             summary = "Update user's username and password by id",
             description = "Update user's username and password by id, return updated user",
@@ -148,7 +125,7 @@ public class UserController {
                     )
             )
     })
-    @CheckAccess
+//    @CheckAccess
     public ResponseEntity<UserResponse> update(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("id") Long userId,

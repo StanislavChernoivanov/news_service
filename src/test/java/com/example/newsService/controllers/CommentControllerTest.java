@@ -102,13 +102,13 @@ public class CommentControllerTest extends AbstractTestController {
         Comment comment = new Comment();
         comment.setComment("Comment");
         News news = News.builder().id(1L).header("News").description("News").build();
-        User user = User.builder().name("User").surname("User").build();
+        User user = User.builder().username("User").build();
 
         Comment createdComment = new Comment(1L, "Comment", user, news);
         CommentResponse commentResponse = new CommentResponse(1L, "Comment");
         UpsertCommentRequest request = new UpsertCommentRequest("Comment");
 
-        Mockito.when(commentService.save(1L, 1L, comment)).thenReturn(createdComment);
+        Mockito.when(commentService.save("User", 1L, comment)).thenReturn(createdComment);
         Mockito.when(commentMapper.requestToComment(request)).thenReturn(comment);
         Mockito.when(commentMapper.commentToResponse(createdComment)).thenReturn(commentResponse);
 
@@ -124,7 +124,7 @@ public class CommentControllerTest extends AbstractTestController {
                 .readStringFromResource("responses/commentResponses/create_comment_response.json");
 
         Mockito.verify(commentService, Mockito.times(1))
-                .save(1L, 1L, comment);
+                .save("User", 1L, comment);
         Mockito.verify(commentMapper, Mockito.times(1))
                 .requestToComment(request);
         Mockito.verify(commentMapper, Mockito.times(1))
@@ -173,6 +173,6 @@ public class CommentControllerTest extends AbstractTestController {
         mockMvc.perform(delete("/api/comment/1?userId=1"))
                 .andExpect(status().isNoContent());
         Mockito.verify(commentService, Mockito.times(1))
-                .delete(1L, 1L);
+                .delete(1L);
     }
 }

@@ -7,6 +7,7 @@ import com.example.newsService.web.model.toResponse.userResponse.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+import org.mapstruct.ValueMapping;
 
 import java.util.List;
 
@@ -18,6 +19,8 @@ public interface UserMapper {
     @Mapping(source = "userId", target = "id")
     User requestToUser(Long userId, UpsertUserRequest upsertUserRequest);
 
+
+    @Mapping(source = "roleTypes", target = "roles")
     UserResponse userToResponse(User user);
 
     List<UserResponse> userListToResponseList(List<User> users);

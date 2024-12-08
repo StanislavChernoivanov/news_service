@@ -1,8 +1,8 @@
 package com.example.newsService.controllers.handlers;
 
-import com.example.newsService.exceptions.AttemptAddingNotUniqueElementException;
-import com.example.newsService.exceptions.DeniedAccessToOperationException;
-import com.example.newsService.exceptions.EntityNotFoundException;
+import com.example.newsService.exceptions.EntityIsNotUniqueException;
+import com.example.newsService.exceptions.OperationIsNotAvailableException;
+import com.example.newsService.exceptions.EntityIsNotFoundException;
 import com.example.newsService.web.model.toResponse.ErrorResponse;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -13,14 +13,15 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 @RestControllerAdvice
 @Data
 @Slf4j
 public class ExceptionHandler {
-    @org.springframework.web.bind.annotation.ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<com.example.newsService.web.model.toResponse.ErrorResponse> notFound(EntityNotFoundException ex) {
+    @org.springframework.web.bind.annotation.ExceptionHandler(EntityIsNotFoundException.class)
+    public ResponseEntity<com.example.newsService.web.model.toResponse.ErrorResponse> notFound(EntityIsNotFoundException ex) {
         log.error("Ошибка при попытке получить сущность", ex);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).
@@ -39,8 +40,8 @@ public class ExceptionHandler {
                 body(new ErrorResponse(errorMessage));
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(DeniedAccessToOperationException.class)
-    public ResponseEntity<ErrorResponse> notAccess(DeniedAccessToOperationException ex) {
+    @org.springframework.web.bind.annotation.ExceptionHandler(OperationIsNotAvailableException.class)
+    public ResponseEntity<ErrorResponse> notAccess(OperationIsNotAvailableException ex) {
         log.error("У пользователя отсутствует доступ" +
                 " для редактирования или удаления этой новости", ex);
 
@@ -48,8 +49,17 @@ public class ExceptionHandler {
                 body(new ErrorResponse(ex.getLocalizedMessage()));
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(AttemptAddingNotUniqueElementException.class)
-    public ResponseEntity<ErrorResponse> notUniqueEntity(AttemptAddingNotUniqueElementException ex) {
+    @org.springframework.web.bind.annotation.ExceptionHandler(EntityIsNotUniqueException.class)
+    public ResponseEntity<ErrorResponse> notUniqueEntity(EntityIsNotUniqueException ex) {
+        log.error("Попытка добавить в базу данных не уникальный элемент", ex);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                body(new ErrorResponse(ex.getLocalizedMessage()));
+    }
+
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> notUniqueEntity(SQLIntegrityConstraintViolationException ex) {
         log.error("Попытка добавить в базу данных не уникальный элемент", ex);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).

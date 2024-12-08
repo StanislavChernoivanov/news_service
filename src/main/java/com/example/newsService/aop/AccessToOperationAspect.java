@@ -36,8 +36,13 @@ public class AccessToOperationAspect {
     public void callAtCommentController() {
     }
 
+    @Pointcut("@annotation(com.example.newsService.aop.CheckAccess)")
+    public void callAtAllMethods() {
 
-    @Before("callAtUserController() && args(userDetails, userId,..) && args(userDetails, userId)")
+    }
+
+
+    @Before("callAtAllMethods() && callAtUserController()")
     public void userAccessChecking(JoinPoint joinPoint) {
 
         Object [] arguments = joinPoint.getArgs();
@@ -60,7 +65,7 @@ public class AccessToOperationAspect {
 
 
 
-    @Before("callAtNewsController() && args(userDetails, newsId,..) && args(userDetails, newsId)")
+    @Before("callAtNewsController() && callAtAllMethods()")
     public void newAccessChecking(JoinPoint joinPoint) {
         Object [] arguments = joinPoint.getArgs();
 
@@ -81,7 +86,7 @@ public class AccessToOperationAspect {
 
 
 
-    @Before("callAtCommentController() && args(userDetails, commentId,..) && args(userDetails, commentId)")
+    @Before("callAtCommentController() && callAtAllMethods()")
     public void commentAccessChecking(JoinPoint joinPoint) {
         Object [] arguments = joinPoint.getArgs();
 

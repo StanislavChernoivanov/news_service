@@ -1,4 +1,4 @@
-package com.example.newsService.configuration;
+package com.example.newsService.configuration.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -50,25 +50,14 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http
             , AuthenticationManager authenticationManager) throws Exception {
         http.authorizeHttpRequests(auth ->
-                auth.requestMatchers(HttpMethod.GET, "/api/user/")
-                        .hasRole("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/user/").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/api/user/**")
-                        .hasAnyRole("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
-                        .requestMatchers(HttpMethod.PUT, "/api/user/**")
-                        .hasAnyRole("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
-                        .requestMatchers(HttpMethod.GET, "/api/user/**")
-                        .hasAnyRole("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
-                        .requestMatchers("/api/news/**")
-                        .hasAnyRole("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
-                        .requestMatchers(HttpMethod.GET, "/api/news_category/**")
-                        .hasAnyRole("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
+                auth.requestMatchers(HttpMethod.GET, "/api/user")
+                        .hasRole("ADMIN")
+                        .requestMatchers("/api/public/account").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/user/account/").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/news_category/**")
-                        .hasAnyRole("ROLE_ADMIN", "ROLE_MODERATOR")
+                        .hasAnyRole("ADMIN", "MODERATOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/news_category/**")
-                        .hasAnyRole("ROLE_ADMIN", "ROLE_MODERATOR")
-                        .requestMatchers("/api/comment/**")
-                        .hasAnyRole("ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER")
+                        .hasAnyRole("ADMIN", "MODERATOR")
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
