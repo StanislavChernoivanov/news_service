@@ -52,8 +52,6 @@ public class NewsServiceImpl implements NewsService {
         Page<News> newsPage = newsRepository.findAll(
                 PageRequest.of(model.getPageNumber(), model.getPageSize())
         );
-        System.err.println(MessageFormat.format("Класс - {0}: не закэшировано",
-                getClass().getSimpleName()));
 
         return updateNewsPage(newsPage).stream().toList();
     }
@@ -68,8 +66,6 @@ public class NewsServiceImpl implements NewsService {
                         String.format("Новость с id %s не найдена", newsId)));
         news.setCategory(news.getNewsCategory().getCategory());
 
-        System.err.println(MessageFormat.format("Класс - {0}: не закэшировано",
-                getClass().getSimpleName()));
         return news;
     }
 

@@ -3,6 +3,7 @@ package com.example.newsService.security;
 import com.example.newsService.model.entities.Role;
 import com.example.newsService.model.entities.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

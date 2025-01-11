@@ -33,12 +33,14 @@ app:
         expiry: 3m
 
 spring:
+#  autoconfigure:
+#    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  profiles:
+    active: prod
   data:
     redis:
       host: localhost
       port: 6379
-  active:
-    profiles: default
   main:
     allow-circular-references: true
   jpa:
@@ -54,6 +56,7 @@ spring:
     username: mysql
     password: mysql
     url: jdbc:mysql://localhost:3310/news_service_db
+    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       schema: news_service_schema
       connection-ini-sql: CREATE SCHEMA IF NOT EXISTS news_service_schema

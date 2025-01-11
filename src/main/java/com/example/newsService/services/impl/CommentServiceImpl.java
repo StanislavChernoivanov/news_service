@@ -38,16 +38,14 @@ public class CommentServiceImpl implements CommentService {
     @Cacheable(cacheNames = AppCacheProperties.CacheNames.COMMENTS_BY_NEWS_ID)
     public List<Comment> findAllByNewsId(Long newsId) {
         News news = newsService.findById(newsId);
-        System.err.println(MessageFormat.format("Класс - {0}: не закэшировано",
-                getClass().getSimpleName()));
+
         return news.getCommentsList();
     }
 
     @Override
     @Cacheable(cacheNames = AppCacheProperties.CacheNames.COMMENT_BY_ID)
     public Comment findById(Long commentId) {
-        System.err.println(MessageFormat.format("Класс - {0}: не закэшировано",
-                getClass().getSimpleName()));
+
         return repository.findById(commentId).orElseThrow(() ->
                 new EntityIsNotFoundException(
                         String.format("Комментарий с id %s не найден", commentId)));

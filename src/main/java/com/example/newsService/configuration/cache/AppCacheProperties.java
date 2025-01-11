@@ -3,6 +3,7 @@ package com.example.newsService.configuration.cache;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.annotation.Profile;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 @Data
 @ConfigurationProperties(prefix = "app.cache")
+@Profile("prod")
 public class AppCacheProperties {
 
     private List<String> cacheNames = new ArrayList<>();

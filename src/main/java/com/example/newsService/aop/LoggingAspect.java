@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Profile("prod")
 public class LoggingAspect {
 
     @Pointcut("execution(public * com.example.newsService.controllers.*.*(..))")
@@ -28,7 +30,7 @@ public class LoggingAspect {
     public void serviceLog() {
     }
 
-    @Pointcut("controllerLog() && serviceLog()")
+    @Pointcut("controllerLog() || serviceLog()")
     public void serviceControllerLog(){}
 
     @Before("controllerLog()")
@@ -82,7 +84,7 @@ public class LoggingAspect {
         long start = System.currentTimeMillis();
         Object proceeded = proceedingJoinPoint.proceed();
         long executingDuration = System.currentTimeMillis() - start;
-        log.info("Method: {}.{}, duration: {}",
+        log.info("Method: {}.{}, duration: {} ms",
                 proceedingJoinPoint.getSignature().getDeclaringType(),
                 proceedingJoinPoint.getSignature().getName(),
                 executingDuration);

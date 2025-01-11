@@ -53,10 +53,7 @@ public class UserServiceImpl implements UserService {
             u.setNewsList(getUpdatedNewsList(u.getNewsList()));
             User.roleTypesInit(u, u.getRoles());
             }
-        );
-
-        System.err.println(MessageFormat.format("Класс - {0}: не закэшировано",
-                getClass().getSimpleName()));
+        );;
 
         return users;
     }
@@ -71,9 +68,6 @@ public class UserServiceImpl implements UserService {
                         String.format("Пользователь с id %s не найден", userId)
                 ));
         user.setNewsList(getUpdatedNewsList(user.getNewsList()));
-
-        System.err.println(MessageFormat.format("Класс - {0}: не закэшировано",
-                getClass().getSimpleName()));
 
         return User.roleTypesInit(user, user.getRoles());
     }

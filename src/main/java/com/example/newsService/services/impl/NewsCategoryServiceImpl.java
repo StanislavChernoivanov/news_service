@@ -41,8 +41,6 @@ public class NewsCategoryServiceImpl implements NewsCategoryService {
         Page<NewsCategory> newsCategoryPage = repository.findAll(
                 PageRequest.of(model.getPageNumber(), model.getPageSize())
         );
-        System.err.println(MessageFormat.format("Класс - {0}: не закэшировано",
-                getClass().getSimpleName()));
 
         return newsCategoryPage.stream().peek(c -> c.setNewsList(withoutComments(c))).toList();
     }
@@ -55,8 +53,7 @@ public class NewsCategoryServiceImpl implements NewsCategoryService {
                         String.format("Категория новостей с id %s не найдена", newsCategoryId)
                 ));
         category.setNewsList(withoutComments(category));
-        System.err.println(MessageFormat.format("Класс - {0}: не закэшировано",
-                getClass().getSimpleName()));
+
         return category;
     }
 

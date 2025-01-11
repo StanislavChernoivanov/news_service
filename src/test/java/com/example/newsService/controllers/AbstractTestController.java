@@ -11,23 +11,67 @@ import com.example.newsService.web.model.toResponse.newsResponse.NewsResponseWit
 import com.example.newsService.web.model.toResponse.newsResponse.NewsResponseWithCommentsList;
 import com.example.newsService.web.model.toResponse.userResponse.UserResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
+@Testcontainers
+@Transactional
+@Sql("classpath:init.sql")
+@ActiveProfiles(profiles = "test")
 public abstract class AbstractTestController {
     @Autowired
     protected MockMvc mockMvc;
 
     @Autowired
     protected ObjectMapper objectMapper;
+
+    @LocalServerPort
+    protected Integer port;
+
+    public static PostgreSQLContainer<?> container
+            = new PostgreSQLContainer<>("postgres:17rc1");
+
+
+    @BeforeAll
+    public static void beforeAll() {
+        container.start();
+    }
+    @AfterAll
+    public static void afterAll() {
+        container.stop();
+    }
+
+
+    @DynamicPropertySource
+    public static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", container::getJdbcUrl);
+        registry.add("spring.datasource.username", container::getUsername);
+        registry.add("spring.datasource.password", container::getPassword);
+
+    }
 
 
 
@@ -72,7 +116,7 @@ public abstract class AbstractTestController {
     }
 
     protected User createUser(Long id) {
-        return User.builder().id(id).username("User " + id).build();
+        return User.builder().id(id).username("user " + id).password("user").build();
     }
 
 

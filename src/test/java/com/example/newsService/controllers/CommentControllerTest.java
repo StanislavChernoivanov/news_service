@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,9 @@ public class CommentControllerTest extends AbstractTestController {
     private CommentService commentService;
     @MockBean
     private CommentMapper commentMapper;
+
     @Test
+    @WithMockUser(username = "user")
     public void whenFindAllByNewsId_thenReturnAllCommentsByNewsId() throws Exception {
         List<Comment> comments = new ArrayList<>();
         Comment comment = createComment(1L, null, null);
@@ -70,6 +73,7 @@ public class CommentControllerTest extends AbstractTestController {
 
 
     @Test
+    @WithMockUser(username = "user")
     public void whenFindById_thenReturnCommentById() throws Exception {
         Comment comment = createComment(1L, null, null);
 
@@ -98,21 +102,22 @@ public class CommentControllerTest extends AbstractTestController {
     }
 
     @Test
+    @WithMockUser(username = "user")
     public void whenCreate_thenReturnCreatedComment() throws Exception {
         Comment comment = new Comment();
         comment.setComment("Comment");
         News news = News.builder().id(1L).header("News").description("News").build();
-        User user = User.builder().username("User").build();
+        User user = User.builder().username("user").build();
 
         Comment createdComment = new Comment(1L, "Comment", user, news);
         CommentResponse commentResponse = new CommentResponse(1L, "Comment");
         UpsertCommentRequest request = new UpsertCommentRequest("Comment");
 
-        Mockito.when(commentService.save("User", 1L, comment)).thenReturn(createdComment);
+        Mockito.when(commentService.save("user", 1L, comment)).thenReturn(createdComment);
         Mockito.when(commentMapper.requestToComment(request)).thenReturn(comment);
         Mockito.when(commentMapper.commentToResponse(createdComment)).thenReturn(commentResponse);
 
-        String actualResponse = mockMvc.perform(post("/api/comment?newsId=1&userId=1")
+        String actualResponse = mockMvc.perform(post("/api/comment?newsId=1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -124,7 +129,7 @@ public class CommentControllerTest extends AbstractTestController {
                 .readStringFromResource("responses/commentResponses/create_comment_response.json");
 
         Mockito.verify(commentService, Mockito.times(1))
-                .save("User", 1L, comment);
+                .save("user", 1L, comment);
         Mockito.verify(commentMapper, Mockito.times(1))
                 .requestToComment(request);
         Mockito.verify(commentMapper, Mockito.times(1))
@@ -135,6 +140,7 @@ public class CommentControllerTest extends AbstractTestController {
     }
 
     @Test
+    @WithMockUser(username = "user")
     public void whenUpdate_thenReturnUpdatedComment() throws Exception {
         Comment comment = new Comment();
         comment.setComment("Comment");
@@ -146,7 +152,7 @@ public class CommentControllerTest extends AbstractTestController {
         Mockito.when(commentMapper.requestToComment(1L, request)).thenReturn(comment);
         Mockito.when(commentMapper.commentToResponse(updatedComment)).thenReturn(commentResponse);
 
-        String actualResponse = mockMvc.perform(put("/api/comment/1?userId=1")
+        String actualResponse = mockMvc.perform(put("/api/comment/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -169,8 +175,9 @@ public class CommentControllerTest extends AbstractTestController {
     }
 
     @Test
+    @WithMockUser(username = "user")
     public void whenDelete_ThenReturnNoContent() throws Exception {
-        mockMvc.perform(delete("/api/comment/1?userId=1"))
+        mockMvc.perform(delete("/api/comment/1"))
                 .andExpect(status().isNoContent());
         Mockito.verify(commentService, Mockito.times(1))
                 .delete(1L);
